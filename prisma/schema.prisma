@@ -60,15 +60,15 @@ model Supplier {
 }
 
 model Inquiry {
-  id            String         @id @default(uuid()) @db.VarChar(36)
-  requestNumber String?        @unique @map("request_number") @db.VarChar(50)   // NO. SURAT PERMINTAAN
-  requestDate   DateTime       @map("request_date") @db.Date
-  customerId    String         @map("customer_id") @db.VarChar(36)
-  status        InquiryStatus  @default(PENDING)
-  remarks       String?        @db.Text
-  noQuotation   Boolean        @default(false) @map("no_quotation") 
-  createdAt     DateTime       @default(now()) @map("created_at") @db.DateTime(0)
-  updatedAt     DateTime       @updatedAt @map("updated_at") @db.DateTime(0)
+  id            String          @id @default(uuid()) @db.VarChar(36)
+  requestNumber String?         @unique @map("request_number") @db.VarChar(50)
+  category      InquiryCategory @default(BARANG)
+  requestDate   DateTime        @map("request_date") @db.Date
+  customerId    String          @map("customer_id") @db.VarChar(36)
+  status        InquiryStatus   @default(PENDING)
+  remarks       String?         @db.Text
+  createdAt     DateTime        @default(now()) @map("created_at") @db.DateTime(0)
+  updatedAt     DateTime        @updatedAt @map("updated_at") @db.DateTime(0)
 
   // Relasi
   customer      Customer       @relation(fields: [customerId], references: [id])
@@ -110,4 +110,9 @@ enum InquiryStatus {
   QUOTED
   ORDERED
   DELIVERED
+}
+
+enum InquiryCategory {
+  BARANG
+  PROJECT
 }

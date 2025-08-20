@@ -8,9 +8,11 @@ interface BasicInputProps {
   multiline: boolean;
   type?: string; // Add type prop
   onChange?: (event: React.ChangeEvent<HTMLInputElement> | any, value: string | null) => void;
+  disabled?: boolean;
+  readOnly?: boolean;
 }
 
-const BasicInput: React.FC<BasicInputProps> = ({ label, value, onChange, multiline, type = "text" }) => {
+const BasicInput: React.FC<BasicInputProps> = ({ label, value, onChange, multiline, type = "text", disabled = false, readOnly = false }) => {
   return (
     <Box
       sx={{
@@ -30,22 +32,26 @@ const BasicInput: React.FC<BasicInputProps> = ({ label, value, onChange, multili
       {multiline ? 
         <CustomTextField 
           minRows={2} 
-          defaultValue={value} 
+          value={value ?? ''}
           onChange={onChange} 
           variant="outlined" 
           multiline 
           fullWidth 
           size="small" 
+          disabled={disabled}
+          InputProps={{ readOnly }}
           sx={{ mb: 2 }} 
         /> 
         : 
         <CustomTextField 
           type={type} // Use the type prop here
-          defaultValue={value} 
+          value={value ?? ''}
           onChange={onChange} 
           variant="outlined" 
           fullWidth 
           size="small" 
+          disabled={disabled}
+          InputProps={{ readOnly }}
           sx={{ mb: 2 }} 
         />
       }

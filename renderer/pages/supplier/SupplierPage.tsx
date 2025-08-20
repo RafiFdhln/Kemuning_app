@@ -164,6 +164,7 @@ const SupplierPage = () => {
       </DashboardCard>
 
       <AddNewDataDrawer
+        width={450}
         open={openDrawer}
         onClose={setOpenDrawer}
         formData={formData}

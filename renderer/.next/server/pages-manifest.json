@@ -2,7 +2,10 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
+  "/transaction/inquiry/InquiryPage": "pages/transaction/inquiry/InquiryPage.js",
+  "/customer/CustomerPage": "pages/customer/CustomerPage.js",
   "/supplier/SupplierPage": "pages/supplier/SupplierPage.js",
-  "/": "pages/index.js",
-  "/transaction/inquiry/InquiryPage": "pages/transaction/inquiry/InquiryPage.js"
+  "/api/company/supplier": "pages/api/company/supplier.js",
+  "/api/company/customer": "pages/api/company/customer.js",
+  "/api/transaction/inquiry": "pages/api/transaction/inquiry.js"
 }

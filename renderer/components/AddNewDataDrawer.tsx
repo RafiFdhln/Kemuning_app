@@ -13,7 +13,9 @@ const AddNewDataDrawer = ({
   handleFormChange, 
   handleSave, 
   formFields,
-  handleOptionChange 
+  width,
+  handleOptionChange,
+  suppliers = [], // tambahkan default value
 }) => {
 
   const handleCloseDrawer = () => {
@@ -58,6 +60,7 @@ const AddNewDataDrawer = ({
             value={formData[field.name] || ''} 
             multiline={false} 
             onChange={(event) => handleFormChange(field.name, event.target.value)}
+            readOnly={field.name === 'requestNumber'}
           />
         );
         case 'numbertext':
@@ -88,6 +91,7 @@ const AddNewDataDrawer = ({
             key="items"
             items={formData.items}
             onChange={(newItems) => handleFormChange("items", newItems)}
+            suppliers={suppliers}
           />
         );
       default:
@@ -101,6 +105,7 @@ const AddNewDataDrawer = ({
       open={open}
       PaperProps={{
         sx: {
+          minWidth: {width},
           flex: 1,
           margin: 2,
           maxHeight: '96%',
@@ -120,9 +125,16 @@ const AddNewDataDrawer = ({
         }}
       >
         {/* Header */}
-        <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'start', gap: 1, justifyItems: 'center' }}>
-          <IconVocabulary size={28} color={baselightTheme.palette.primary.dark} />
-          <Typography variant="h5" mb={3}>Tambah Akun Baru</Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}>
+            {/* <IconVocabulary size={28} color={baselightTheme.palette.primary.dark} /> */}
+            <Typography variant="h5" mb={3}>Tambah Inquiry</Typography>
+          </Box>
+          {formData?.requestNumber ? (
+            <Typography variant="subtitle2" sx={{ mb: 3, color: baselightTheme.palette.text.secondary }}>
+              {formData.requestNumber}
+            </Typography>
+          ) : null}
         </Box>
 
         {/* Form Fields */}
@@ -135,14 +147,11 @@ const AddNewDataDrawer = ({
           }}
         >
           <Divider sx={{ mb: 3 }} />
-
-          {/* Render form fields dinamis */}
           {formFields.map(field => renderFormField(field))}
 
         </Box>
 
-        {/* Footer Buttons */}
-        <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'end', gap: 3 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'end', gap: 3, mt:3, mb:3}}>
           <Button
             sx={{
               fontWeight: 600,
@@ -150,15 +159,15 @@ const AddNewDataDrawer = ({
               borderColor: baselightTheme.palette.grey[400],
             }}
             variant="outlined"
-            onClick={handleCloseDrawer} // Handle Close Drawer
+            onClick={handleCloseDrawer}
           >
             Batal
           </Button>
           
           <Button
-            sx={{ fontWeight: 600,color: 'white' }}
+            sx={{ fontWeight: 600, color: 'white' }}
             variant="contained"
-            onClick={handleSave} // Handle Save Action
+            onClick={handleSave}
           >
             Simpan
           </Button>

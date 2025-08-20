@@ -6,17 +6,18 @@ import { baselightTheme } from "../../../src/theme/DefaultColors";
 import DataTable from "../../../components/DataTable";
 import { MRT_ColumnDef } from "material-react-table";
 import { useMemo, useState, useEffect } from "react";
-import { IconCirclePlus, IconFileInvoice } from "@tabler/icons-react";
+import { IconCirclePlus } from "@tabler/icons-react";
 import AddNewDataDrawer from "../../../components/AddNewDataDrawer";
 import * as XLSX from "xlsx";
+import InquiryDetailDrawer from "../../../components/InquiryDetailDrawer";
 
 type Inquiry = {
   requestNumber: string;
   requestDate: Date;
-  customer: string;
+  category: "BARANG" | "PROJECT";
+  customer: any;
   remarks: string;
-  status: "PENDING" | "APPROVED" | "REJECTED";
-  noQuotation: boolean;
+  status: "PENDING" | "QUOTED" | "ORDERED" | "DELIVERED";
   items: InquiryItem[];
 };
 
@@ -34,6 +35,8 @@ type InquiryItem = {
   poPrice?: number;
   notes?: string;
   deliveryTime?: string;
+  supplierId?: string;
+  supplierName?: string;
 };
 
 const InquiryPage = () => {
@@ -41,20 +44,34 @@ const InquiryPage = () => {
   const [alertOpen, setAlertOpen] = useState(false);
   const [data, setData] = useState<Inquiry[]>([]);
   const [customers, setCustomers] = useState<{ id: string; name: string }[]>([]);
+  const [suppliers, setSuppliers] = useState<{ label: string; value: string }[]>([]);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [errorOpen, setErrorOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
+
+  const formatDateTimeLocal = (d: Date) => {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    const mm = pad(d.getMonth() + 1);
+    const dd = pad(d.getDate());
+    const hh = pad(d.getHours());
+    const mi = pad(d.getMinutes());
+    return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+  };
 
   const [formData, setFormData] = useState<
     Omit<Inquiry, "requestDate" | "items" | "customer"> & { requestDate: string; items: InquiryItem[]; customerId: string }
   >({
     requestNumber: "",
-    requestDate: new Date().toISOString(),
+    requestDate: formatDateTimeLocal(new Date()),
+    category: "BARANG",
     customerId: "",
     remarks: "",
     status: "PENDING",
-    noQuotation: false,
     items: [],
   });
 
-  // Fetch customer list
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
@@ -68,7 +85,6 @@ const InquiryPage = () => {
     fetchCustomers();
   }, []);
 
-  // Fetch inquiry list dari API
   useEffect(() => {
     const fetchInquiries = async () => {
       try {
@@ -82,10 +98,50 @@ const InquiryPage = () => {
     fetchInquiries();
   }, []);
 
-  // Update formFields: customerId autocomplete
+  useEffect(() => {
+    const fetchSuppliers = async () => {
+      try {
+        const res = await fetch("/api/company/supplier");
+        const result = await res.json();
+        setSuppliers(
+          (result.data || []).map((s: any) => ({ label: s.name, value: s.id }))
+        );
+      } catch (err) {
+        setSuppliers([]);
+      }
+    };
+    fetchSuppliers();
+  }, []);
+
+  const generateNextRequestNumber = (requestDateIso: string, existing: Inquiry[]): string => {
+    const date = new Date(requestDateIso);
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const yy = String(date.getFullYear() % 100).padStart(2, '0');
+    const prefix = `INQ-${mm}${yy}`;
+
+    const lastSeq = existing
+      .map((d) => d.requestNumber)
+      .filter((rn) => typeof rn === 'string' && rn.startsWith(prefix))
+      .map((rn) => parseInt(rn.slice(-3), 10))
+      .filter((n) => !isNaN(n))
+      .reduce((max, n) => (n > max ? n : max), 0);
+
+    const nextSeq = String(lastSeq + 1).padStart(3, '0');
+    return `${prefix}${nextSeq}`;
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    setFormData((prev) => ({
+      ...prev,
+      requestNumber: generateNextRequestNumber(prev.requestDate, data),
+      items: (prev.items && prev.items.length > 0) ? prev.items : [{ name: "", qty: 1 } as any],
+    }));
+  }, [open, formData.requestDate, data]);
+
   const formFields = [
-    { name: "requestNumber", label: "Nomor Permintaan", type: "text" },
     { name: "requestDate", label: "Tanggal Permintaan", type: "datetime" },
+    { name: "category", label: "Kategori", type: "autocomplete", options: ["BARANG", "PROJECT"] },
     {
       name: "customerId",
       label: "Customer",
@@ -93,14 +149,13 @@ const InquiryPage = () => {
       options: customers.map((c) => ({ label: c.name, value: c.id })),
     },
     { name: "remarks", label: "Keterangan", type: "textarea" },
-    { name: "status", label: "Status", type: "autocomplete", options: ["PENDING", "APPROVED", "REJECTED"] },
-    { name: "noQuotation", label: "Tanpa Quotation", type: "autocomplete", options: [true, false] },
+    { name: "status", label: "Status", type: "autocomplete", options: ["PENDING", "QUOTED", "ORDERED", "DELIVERED"] },
     { name: "items", label: "Items", type: "items" },
   ];
 
-  // Tampilkan nama customer di tabel
   const columns = useMemo<MRT_ColumnDef<Inquiry & { customerName?: string }>[]>(() => [
     { accessorKey: "requestNumber", header: "No Permintaan" },
+    { accessorKey: "category", header: "Kategori" },
     { accessorKey: "requestDate", header: "Tanggal", Cell: ({ cell }) => new Date(cell.getValue<Date>()).toLocaleDateString() },
     {
       accessorKey: "customerId",
@@ -112,12 +167,14 @@ const InquiryPage = () => {
     },
     { accessorKey: "remarks", header: "Keterangan" },
     { accessorKey: "status", header: "Status" },
-    { accessorKey: "noQuotation", header: "Tanpa Quotation", Cell: ({ cell }) => (cell.getValue<boolean>() ? "Ya" : "Tidak") },
     {
       header: "Aksi",
       id: "aksi",
       Cell: ({ row }) => (
-        <Button size="small" variant="outlined" onClick={() => alert(JSON.stringify(row.original, null, 2))}>
+        <Button size="small" variant="outlined" onClick={() => {
+          setSelectedInquiry(row.original);
+          setDetailOpen(true);
+        }}>
           Detail
         </Button>
       ),
@@ -133,62 +190,37 @@ const InquiryPage = () => {
     setFormData({ ...formData, [field]: value || "" });
   };
 
-  // const handleSave = () => {
-  //   const newInquiry: Inquiry = {
-  //     ...formData,
-  //     requestDate: new Date(formData.requestDate),
-  //     // noQuotation: formData.noQuotation === true || formData.noQuotation === "true",
-  //   };
 
-  //   setData((prev) => [...prev, newInquiry]);
-  //   setAlertOpen(true);
-  //   toggleDrawer(false)();
-  // };
-  // const handleSave = async () => {
-  //   try {
-  //     const response = await fetch('/api/transaction/inquiry', {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify(formData),
-  //     });
-
-  //     if (!response.ok) throw new Error('Gagal menyimpan pemasok');
-
-  //     const result = await response.json();
-  //     setData((prev) => [...prev, result.data]);
-  //     setAlertOpen(true);
-  //     toggleDrawer(false)();
-  //   } catch (error) {
-  //     console.error(error.message);
-  //   }
-  // };
   const handleSave = async () => {
-  try {
-    const payload = {
-      ...formData,
-      requestDate: formData.requestDate,
-      noQuotation: Boolean(formData.noQuotation),
-      items: formData.items,
-    };
-    const res = await fetch("/api/transaction/inquiry", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) throw new Error("Gagal menyimpan Inquiry");
-    const result = await res.json();
-    setData((prev) => [...prev, result.data]);
-    setAlertOpen(true);
-    toggleDrawer(false)();
-  } catch (err: any) {
-    console.error("Error saving inquiry:", err.message);
-  }
-};
+    try {
+      const payload = {
+        ...formData,
+        requestDate: formData.requestDate,
+        items: formData.items,
+      };
+      const res = await fetch("/api/transaction/inquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json().catch(() => ({}));
+      setData((prev) => [...prev, result.data]);
+      setAlertOpen(true);
+      toggleDrawer(false)();
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
 
 
   const handleCloseAlert = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === "clickaway") return;
     setAlertOpen(false);
+  };
+
+  const handleCloseError = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === "clickaway") return;
+    setErrorOpen(false);
   };
 
   const exportToExcel = () => {
@@ -243,6 +275,11 @@ const InquiryPage = () => {
       <DashboardCard>
         <DataTable columns={columns} data={data} pageSize={10} showGlobalFilter={true} />
       </DashboardCard>
+      <InquiryDetailDrawer
+        open={detailOpen}
+        onClose={() => setDetailOpen(false)}
+        inquiry={selectedInquiry}
+      />
 
       <AddNewDataDrawer
         open={open}
@@ -252,6 +289,8 @@ const InquiryPage = () => {
         handleOptionChange={handleOptionChange}
         handleSave={handleSave}
         formFields={formFields}
+        suppliers={suppliers}
+        width={"98%"}
       />
 
       <Snackbar
@@ -262,6 +301,17 @@ const InquiryPage = () => {
       >
         <Alert variant="filled" severity="success" sx={{ color: baselightTheme.palette.success.contrastText, width: "100%" }}>
           Inquiry berhasil disimpan!
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={errorOpen}
+        autoHideDuration={2000}
+        onClose={handleCloseError}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert variant="filled" severity="error" sx={{ width: "100%" }}>
+          {errorMessage}
         </Alert>
       </Snackbar>
     </PageContainer>

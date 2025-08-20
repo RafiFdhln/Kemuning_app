@@ -152,11 +152,11 @@ exports.Prisma.SupplierScalarFieldEnum = {
 exports.Prisma.InquiryScalarFieldEnum = {
   id: 'id',
   requestNumber: 'requestNumber',
+  category: 'category',
   requestDate: 'requestDate',
   customerId: 'customerId',
   status: 'status',
   remarks: 'remarks',
-  noQuotation: 'noQuotation',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -239,6 +239,11 @@ exports.Prisma.InquiryItemOrderByRelevanceFieldEnum = {
 exports.ItemType = exports.$Enums.ItemType = {
   GOODS: 'GOODS',
   SERVICE: 'SERVICE'
+};
+
+exports.InquiryCategory = exports.$Enums.InquiryCategory = {
+  BARANG: 'BARANG',
+  PROJECT: 'PROJECT'
 };
 
 exports.InquiryStatus = exports.$Enums.InquiryStatus = {

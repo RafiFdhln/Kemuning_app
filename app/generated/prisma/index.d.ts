@@ -60,6 +60,14 @@ export const InquiryStatus: {
 
 export type InquiryStatus = (typeof InquiryStatus)[keyof typeof InquiryStatus]
 
+
+export const InquiryCategory: {
+  BARANG: 'BARANG',
+  PROJECT: 'PROJECT'
+};
+
+export type InquiryCategory = (typeof InquiryCategory)[keyof typeof InquiryCategory]
+
 }
 
 export type ItemType = $Enums.ItemType
@@ -69,6 +77,10 @@ export const ItemType: typeof $Enums.ItemType
 export type InquiryStatus = $Enums.InquiryStatus
 
 export const InquiryStatus: typeof $Enums.InquiryStatus
+
+export type InquiryCategory = $Enums.InquiryCategory
+
+export const InquiryCategory: typeof $Enums.InquiryCategory
 
 /**
  * ##  Prisma Client ʲˢ
@@ -4327,11 +4339,11 @@ export namespace Prisma {
   export type InquiryMinAggregateOutputType = {
     id: string | null
     requestNumber: string | null
+    category: $Enums.InquiryCategory | null
     requestDate: Date | null
     customerId: string | null
     status: $Enums.InquiryStatus | null
     remarks: string | null
-    noQuotation: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4339,11 +4351,11 @@ export namespace Prisma {
   export type InquiryMaxAggregateOutputType = {
     id: string | null
     requestNumber: string | null
+    category: $Enums.InquiryCategory | null
     requestDate: Date | null
     customerId: string | null
     status: $Enums.InquiryStatus | null
     remarks: string | null
-    noQuotation: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4351,11 +4363,11 @@ export namespace Prisma {
   export type InquiryCountAggregateOutputType = {
     id: number
     requestNumber: number
+    category: number
     requestDate: number
     customerId: number
     status: number
     remarks: number
-    noQuotation: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -4365,11 +4377,11 @@ export namespace Prisma {
   export type InquiryMinAggregateInputType = {
     id?: true
     requestNumber?: true
+    category?: true
     requestDate?: true
     customerId?: true
     status?: true
     remarks?: true
-    noQuotation?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4377,11 +4389,11 @@ export namespace Prisma {
   export type InquiryMaxAggregateInputType = {
     id?: true
     requestNumber?: true
+    category?: true
     requestDate?: true
     customerId?: true
     status?: true
     remarks?: true
-    noQuotation?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4389,11 +4401,11 @@ export namespace Prisma {
   export type InquiryCountAggregateInputType = {
     id?: true
     requestNumber?: true
+    category?: true
     requestDate?: true
     customerId?: true
     status?: true
     remarks?: true
-    noQuotation?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -4474,11 +4486,11 @@ export namespace Prisma {
   export type InquiryGroupByOutputType = {
     id: string
     requestNumber: string | null
+    category: $Enums.InquiryCategory
     requestDate: Date
     customerId: string
     status: $Enums.InquiryStatus
     remarks: string | null
-    noQuotation: boolean
     createdAt: Date
     updatedAt: Date
     _count: InquiryCountAggregateOutputType | null
@@ -4503,11 +4515,11 @@ export namespace Prisma {
   export type InquirySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     requestNumber?: boolean
+    category?: boolean
     requestDate?: boolean
     customerId?: boolean
     status?: boolean
     remarks?: boolean
-    noQuotation?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     customer?: boolean | CustomerDefaultArgs<ExtArgs>
@@ -4520,16 +4532,16 @@ export namespace Prisma {
   export type InquirySelectScalar = {
     id?: boolean
     requestNumber?: boolean
+    category?: boolean
     requestDate?: boolean
     customerId?: boolean
     status?: boolean
     remarks?: boolean
-    noQuotation?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type InquiryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "requestNumber" | "requestDate" | "customerId" | "status" | "remarks" | "noQuotation" | "createdAt" | "updatedAt", ExtArgs["result"]["inquiry"]>
+  export type InquiryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "requestNumber" | "category" | "requestDate" | "customerId" | "status" | "remarks" | "createdAt" | "updatedAt", ExtArgs["result"]["inquiry"]>
   export type InquiryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     customer?: boolean | CustomerDefaultArgs<ExtArgs>
     items?: boolean | Inquiry$itemsArgs<ExtArgs>
@@ -4545,11 +4557,11 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       requestNumber: string | null
+      category: $Enums.InquiryCategory
       requestDate: Date
       customerId: string
       status: $Enums.InquiryStatus
       remarks: string | null
-      noQuotation: boolean
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["inquiry"]>
@@ -4925,11 +4937,11 @@ export namespace Prisma {
   interface InquiryFieldRefs {
     readonly id: FieldRef<"Inquiry", 'String'>
     readonly requestNumber: FieldRef<"Inquiry", 'String'>
+    readonly category: FieldRef<"Inquiry", 'InquiryCategory'>
     readonly requestDate: FieldRef<"Inquiry", 'DateTime'>
     readonly customerId: FieldRef<"Inquiry", 'String'>
     readonly status: FieldRef<"Inquiry", 'InquiryStatus'>
     readonly remarks: FieldRef<"Inquiry", 'String'>
-    readonly noQuotation: FieldRef<"Inquiry", 'Boolean'>
     readonly createdAt: FieldRef<"Inquiry", 'DateTime'>
     readonly updatedAt: FieldRef<"Inquiry", 'DateTime'>
   }
@@ -6537,11 +6549,11 @@ export namespace Prisma {
   export const InquiryScalarFieldEnum: {
     id: 'id',
     requestNumber: 'requestNumber',
+    category: 'category',
     requestDate: 'requestDate',
     customerId: 'customerId',
     status: 'status',
     remarks: 'remarks',
-    noQuotation: 'noQuotation',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -6676,6 +6688,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'InquiryCategory'
+   */
+  export type EnumInquiryCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InquiryCategory'>
+    
+
+
+  /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -6686,13 +6705,6 @@ export namespace Prisma {
    * Reference to a field of type 'InquiryStatus'
    */
   export type EnumInquiryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InquiryStatus'>
-    
-
-
-  /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -6914,11 +6926,11 @@ export namespace Prisma {
     NOT?: InquiryWhereInput | InquiryWhereInput[]
     id?: StringFilter<"Inquiry"> | string
     requestNumber?: StringNullableFilter<"Inquiry"> | string | null
+    category?: EnumInquiryCategoryFilter<"Inquiry"> | $Enums.InquiryCategory
     requestDate?: DateTimeFilter<"Inquiry"> | Date | string
     customerId?: StringFilter<"Inquiry"> | string
     status?: EnumInquiryStatusFilter<"Inquiry"> | $Enums.InquiryStatus
     remarks?: StringNullableFilter<"Inquiry"> | string | null
-    noQuotation?: BoolFilter<"Inquiry"> | boolean
     createdAt?: DateTimeFilter<"Inquiry"> | Date | string
     updatedAt?: DateTimeFilter<"Inquiry"> | Date | string
     customer?: XOR<CustomerScalarRelationFilter, CustomerWhereInput>
@@ -6928,11 +6940,11 @@ export namespace Prisma {
   export type InquiryOrderByWithRelationInput = {
     id?: SortOrder
     requestNumber?: SortOrderInput | SortOrder
+    category?: SortOrder
     requestDate?: SortOrder
     customerId?: SortOrder
     status?: SortOrder
     remarks?: SortOrderInput | SortOrder
-    noQuotation?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     customer?: CustomerOrderByWithRelationInput
@@ -6946,11 +6958,11 @@ export namespace Prisma {
     AND?: InquiryWhereInput | InquiryWhereInput[]
     OR?: InquiryWhereInput[]
     NOT?: InquiryWhereInput | InquiryWhereInput[]
+    category?: EnumInquiryCategoryFilter<"Inquiry"> | $Enums.InquiryCategory
     requestDate?: DateTimeFilter<"Inquiry"> | Date | string
     customerId?: StringFilter<"Inquiry"> | string
     status?: EnumInquiryStatusFilter<"Inquiry"> | $Enums.InquiryStatus
     remarks?: StringNullableFilter<"Inquiry"> | string | null
-    noQuotation?: BoolFilter<"Inquiry"> | boolean
     createdAt?: DateTimeFilter<"Inquiry"> | Date | string
     updatedAt?: DateTimeFilter<"Inquiry"> | Date | string
     customer?: XOR<CustomerScalarRelationFilter, CustomerWhereInput>
@@ -6960,11 +6972,11 @@ export namespace Prisma {
   export type InquiryOrderByWithAggregationInput = {
     id?: SortOrder
     requestNumber?: SortOrderInput | SortOrder
+    category?: SortOrder
     requestDate?: SortOrder
     customerId?: SortOrder
     status?: SortOrder
     remarks?: SortOrderInput | SortOrder
-    noQuotation?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: InquiryCountOrderByAggregateInput
@@ -6978,11 +6990,11 @@ export namespace Prisma {
     NOT?: InquiryScalarWhereWithAggregatesInput | InquiryScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Inquiry"> | string
     requestNumber?: StringNullableWithAggregatesFilter<"Inquiry"> | string | null
+    category?: EnumInquiryCategoryWithAggregatesFilter<"Inquiry"> | $Enums.InquiryCategory
     requestDate?: DateTimeWithAggregatesFilter<"Inquiry"> | Date | string
     customerId?: StringWithAggregatesFilter<"Inquiry"> | string
     status?: EnumInquiryStatusWithAggregatesFilter<"Inquiry"> | $Enums.InquiryStatus
     remarks?: StringNullableWithAggregatesFilter<"Inquiry"> | string | null
-    noQuotation?: BoolWithAggregatesFilter<"Inquiry"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Inquiry"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Inquiry"> | Date | string
   }
@@ -7329,10 +7341,10 @@ export namespace Prisma {
   export type InquiryCreateInput = {
     id?: string
     requestNumber?: string | null
+    category?: $Enums.InquiryCategory
     requestDate: Date | string
     status?: $Enums.InquiryStatus
     remarks?: string | null
-    noQuotation?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     customer: CustomerCreateNestedOneWithoutInquiriesInput
@@ -7342,11 +7354,11 @@ export namespace Prisma {
   export type InquiryUncheckedCreateInput = {
     id?: string
     requestNumber?: string | null
+    category?: $Enums.InquiryCategory
     requestDate: Date | string
     customerId: string
     status?: $Enums.InquiryStatus
     remarks?: string | null
-    noQuotation?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     items?: InquiryItemUncheckedCreateNestedManyWithoutInquiryInput
@@ -7355,10 +7367,10 @@ export namespace Prisma {
   export type InquiryUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     requestNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumInquiryCategoryFieldUpdateOperationsInput | $Enums.InquiryCategory
     requestDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumInquiryStatusFieldUpdateOperationsInput | $Enums.InquiryStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
-    noQuotation?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     customer?: CustomerUpdateOneRequiredWithoutInquiriesNestedInput
@@ -7368,11 +7380,11 @@ export namespace Prisma {
   export type InquiryUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     requestNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumInquiryCategoryFieldUpdateOperationsInput | $Enums.InquiryCategory
     requestDate?: DateTimeFieldUpdateOperationsInput | Date | string
     customerId?: StringFieldUpdateOperationsInput | string
     status?: EnumInquiryStatusFieldUpdateOperationsInput | $Enums.InquiryStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
-    noQuotation?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: InquiryItemUncheckedUpdateManyWithoutInquiryNestedInput
@@ -7381,11 +7393,11 @@ export namespace Prisma {
   export type InquiryCreateManyInput = {
     id?: string
     requestNumber?: string | null
+    category?: $Enums.InquiryCategory
     requestDate: Date | string
     customerId: string
     status?: $Enums.InquiryStatus
     remarks?: string | null
-    noQuotation?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -7393,10 +7405,10 @@ export namespace Prisma {
   export type InquiryUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     requestNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumInquiryCategoryFieldUpdateOperationsInput | $Enums.InquiryCategory
     requestDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumInquiryStatusFieldUpdateOperationsInput | $Enums.InquiryStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
-    noQuotation?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -7404,11 +7416,11 @@ export namespace Prisma {
   export type InquiryUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     requestNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumInquiryCategoryFieldUpdateOperationsInput | $Enums.InquiryCategory
     requestDate?: DateTimeFieldUpdateOperationsInput | Date | string
     customerId?: StringFieldUpdateOperationsInput | string
     status?: EnumInquiryStatusFieldUpdateOperationsInput | $Enums.InquiryStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
-    noQuotation?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -7798,6 +7810,13 @@ export namespace Prisma {
     remarks?: SortOrder
   }
 
+  export type EnumInquiryCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.InquiryCategory | EnumInquiryCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.InquiryCategory[]
+    notIn?: $Enums.InquiryCategory[]
+    not?: NestedEnumInquiryCategoryFilter<$PrismaModel> | $Enums.InquiryCategory
+  }
+
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[]
@@ -7816,11 +7835,6 @@ export namespace Prisma {
     not?: NestedEnumInquiryStatusFilter<$PrismaModel> | $Enums.InquiryStatus
   }
 
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
   export type CustomerScalarRelationFilter = {
     is?: CustomerWhereInput
     isNot?: CustomerWhereInput
@@ -7835,11 +7849,11 @@ export namespace Prisma {
   export type InquiryCountOrderByAggregateInput = {
     id?: SortOrder
     requestNumber?: SortOrder
+    category?: SortOrder
     requestDate?: SortOrder
     customerId?: SortOrder
     status?: SortOrder
     remarks?: SortOrder
-    noQuotation?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -7847,11 +7861,11 @@ export namespace Prisma {
   export type InquiryMaxOrderByAggregateInput = {
     id?: SortOrder
     requestNumber?: SortOrder
+    category?: SortOrder
     requestDate?: SortOrder
     customerId?: SortOrder
     status?: SortOrder
     remarks?: SortOrder
-    noQuotation?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -7859,13 +7873,23 @@ export namespace Prisma {
   export type InquiryMinOrderByAggregateInput = {
     id?: SortOrder
     requestNumber?: SortOrder
+    category?: SortOrder
     requestDate?: SortOrder
     customerId?: SortOrder
     status?: SortOrder
     remarks?: SortOrder
-    noQuotation?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type EnumInquiryCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InquiryCategory | EnumInquiryCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.InquiryCategory[]
+    notIn?: $Enums.InquiryCategory[]
+    not?: NestedEnumInquiryCategoryWithAggregatesFilter<$PrismaModel> | $Enums.InquiryCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInquiryCategoryFilter<$PrismaModel>
+    _max?: NestedEnumInquiryCategoryFilter<$PrismaModel>
   }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -7890,14 +7914,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumInquiryStatusFilter<$PrismaModel>
     _max?: NestedEnumInquiryStatusFilter<$PrismaModel>
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type IntFilter<$PrismaModel = never> = {
@@ -8219,16 +8235,16 @@ export namespace Prisma {
     connect?: InquiryItemWhereUniqueInput | InquiryItemWhereUniqueInput[]
   }
 
+  export type EnumInquiryCategoryFieldUpdateOperationsInput = {
+    set?: $Enums.InquiryCategory
+  }
+
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
   }
 
   export type EnumInquiryStatusFieldUpdateOperationsInput = {
     set?: $Enums.InquiryStatus
-  }
-
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
   }
 
   export type CustomerUpdateOneRequiredWithoutInquiriesNestedInput = {
@@ -8457,6 +8473,13 @@ export namespace Prisma {
     _max?: NestedDecimalNullableFilter<$PrismaModel>
   }
 
+  export type NestedEnumInquiryCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.InquiryCategory | EnumInquiryCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.InquiryCategory[]
+    notIn?: $Enums.InquiryCategory[]
+    not?: NestedEnumInquiryCategoryFilter<$PrismaModel> | $Enums.InquiryCategory
+  }
+
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[]
@@ -8475,9 +8498,14 @@ export namespace Prisma {
     not?: NestedEnumInquiryStatusFilter<$PrismaModel> | $Enums.InquiryStatus
   }
 
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
+  export type NestedEnumInquiryCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InquiryCategory | EnumInquiryCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.InquiryCategory[]
+    notIn?: $Enums.InquiryCategory[]
+    not?: NestedEnumInquiryCategoryWithAggregatesFilter<$PrismaModel> | $Enums.InquiryCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInquiryCategoryFilter<$PrismaModel>
+    _max?: NestedEnumInquiryCategoryFilter<$PrismaModel>
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -8502,14 +8530,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumInquiryStatusFilter<$PrismaModel>
     _max?: NestedEnumInquiryStatusFilter<$PrismaModel>
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
@@ -8654,10 +8674,10 @@ export namespace Prisma {
   export type InquiryCreateWithoutCustomerInput = {
     id?: string
     requestNumber?: string | null
+    category?: $Enums.InquiryCategory
     requestDate: Date | string
     status?: $Enums.InquiryStatus
     remarks?: string | null
-    noQuotation?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     items?: InquiryItemCreateNestedManyWithoutInquiryInput
@@ -8666,10 +8686,10 @@ export namespace Prisma {
   export type InquiryUncheckedCreateWithoutCustomerInput = {
     id?: string
     requestNumber?: string | null
+    category?: $Enums.InquiryCategory
     requestDate: Date | string
     status?: $Enums.InquiryStatus
     remarks?: string | null
-    noQuotation?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     items?: InquiryItemUncheckedCreateNestedManyWithoutInquiryInput
@@ -8707,11 +8727,11 @@ export namespace Prisma {
     NOT?: InquiryScalarWhereInput | InquiryScalarWhereInput[]
     id?: StringFilter<"Inquiry"> | string
     requestNumber?: StringNullableFilter<"Inquiry"> | string | null
+    category?: EnumInquiryCategoryFilter<"Inquiry"> | $Enums.InquiryCategory
     requestDate?: DateTimeFilter<"Inquiry"> | Date | string
     customerId?: StringFilter<"Inquiry"> | string
     status?: EnumInquiryStatusFilter<"Inquiry"> | $Enums.InquiryStatus
     remarks?: StringNullableFilter<"Inquiry"> | string | null
-    noQuotation?: BoolFilter<"Inquiry"> | boolean
     createdAt?: DateTimeFilter<"Inquiry"> | Date | string
     updatedAt?: DateTimeFilter<"Inquiry"> | Date | string
   }
@@ -8899,10 +8919,10 @@ export namespace Prisma {
   export type InquiryCreateWithoutItemsInput = {
     id?: string
     requestNumber?: string | null
+    category?: $Enums.InquiryCategory
     requestDate: Date | string
     status?: $Enums.InquiryStatus
     remarks?: string | null
-    noQuotation?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     customer: CustomerCreateNestedOneWithoutInquiriesInput
@@ -8911,11 +8931,11 @@ export namespace Prisma {
   export type InquiryUncheckedCreateWithoutItemsInput = {
     id?: string
     requestNumber?: string | null
+    category?: $Enums.InquiryCategory
     requestDate: Date | string
     customerId: string
     status?: $Enums.InquiryStatus
     remarks?: string | null
-    noQuotation?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -8989,10 +9009,10 @@ export namespace Prisma {
   export type InquiryUpdateWithoutItemsInput = {
     id?: StringFieldUpdateOperationsInput | string
     requestNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumInquiryCategoryFieldUpdateOperationsInput | $Enums.InquiryCategory
     requestDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumInquiryStatusFieldUpdateOperationsInput | $Enums.InquiryStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
-    noQuotation?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     customer?: CustomerUpdateOneRequiredWithoutInquiriesNestedInput
@@ -9001,11 +9021,11 @@ export namespace Prisma {
   export type InquiryUncheckedUpdateWithoutItemsInput = {
     id?: StringFieldUpdateOperationsInput | string
     requestNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumInquiryCategoryFieldUpdateOperationsInput | $Enums.InquiryCategory
     requestDate?: DateTimeFieldUpdateOperationsInput | Date | string
     customerId?: StringFieldUpdateOperationsInput | string
     status?: EnumInquiryStatusFieldUpdateOperationsInput | $Enums.InquiryStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
-    noQuotation?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9151,10 +9171,10 @@ export namespace Prisma {
   export type InquiryCreateManyCustomerInput = {
     id?: string
     requestNumber?: string | null
+    category?: $Enums.InquiryCategory
     requestDate: Date | string
     status?: $Enums.InquiryStatus
     remarks?: string | null
-    noQuotation?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -9162,10 +9182,10 @@ export namespace Prisma {
   export type InquiryUpdateWithoutCustomerInput = {
     id?: StringFieldUpdateOperationsInput | string
     requestNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumInquiryCategoryFieldUpdateOperationsInput | $Enums.InquiryCategory
     requestDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumInquiryStatusFieldUpdateOperationsInput | $Enums.InquiryStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
-    noQuotation?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: InquiryItemUpdateManyWithoutInquiryNestedInput
@@ -9174,10 +9194,10 @@ export namespace Prisma {
   export type InquiryUncheckedUpdateWithoutCustomerInput = {
     id?: StringFieldUpdateOperationsInput | string
     requestNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumInquiryCategoryFieldUpdateOperationsInput | $Enums.InquiryCategory
     requestDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumInquiryStatusFieldUpdateOperationsInput | $Enums.InquiryStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
-    noQuotation?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: InquiryItemUncheckedUpdateManyWithoutInquiryNestedInput
@@ -9186,10 +9206,10 @@ export namespace Prisma {
   export type InquiryUncheckedUpdateManyWithoutCustomerInput = {
     id?: StringFieldUpdateOperationsInput | string
     requestNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: EnumInquiryCategoryFieldUpdateOperationsInput | $Enums.InquiryCategory
     requestDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumInquiryStatusFieldUpdateOperationsInput | $Enums.InquiryStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
-    noQuotation?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
