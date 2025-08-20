@@ -1,0 +1,113 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Item {
+  id          String        @id @default(uuid()) @db.VarChar(36)
+  code        String        @unique @db.VarChar(50)     // kode barang/jasa
+  name        String        @db.VarChar(100)
+  brand       String?       @db.VarChar(100)            // merk (optional)
+  type        ItemType
+  unit        String?       @db.VarChar(20)             // satuan default
+  price       Decimal?      @db.Decimal(18, 2)          // harga default (opsional)
+  remarks     String?       @db.VarChar(255)            // catatan tambahan
+
+  // Relasi
+  inquiryItems  InquiryItem[] 
+
+  @@map("items")
+}
+
+enum ItemType {
+  GOODS
+  SERVICE
+}
+
+model Customer {
+  id        String   @id @default(uuid()) @db.VarChar(36)
+  code      String   @unique @db.VarChar(20)
+  name      String   @db.VarChar(100)
+  npwp      String?  @unique @db.VarChar(20)
+  address   String?  @db.VarChar(255)
+  remarks   String?  @db.VarChar(255)
+
+  // Relasi
+  inquiries Inquiry[]
+
+  @@map("customers")
+}
+
+model Supplier {
+  id        String     @id @default(uuid()) @db.VarChar(36)
+  code      String     @unique @db.VarChar(20)
+  name      String     @db.VarChar(100)
+  npwp      String?    @unique @db.VarChar(20)
+  address   String?    @db.VarChar(255)
+  remarks   String?    @db.VarChar(255)
+
+  // Relasi
+  inquiryItems InquiryItem[]
+
+  @@map("suppliers")
+}
+
+model Inquiry {
+  id            String         @id @default(uuid()) @db.VarChar(36)
+  requestNumber String?        @unique @map("request_number") @db.VarChar(50)   // NO. SURAT PERMINTAAN
+  requestDate   DateTime       @map("request_date") @db.Date
+  customerId    String         @map("customer_id") @db.VarChar(36)
+  status        InquiryStatus  @default(PENDING)
+  remarks       String?        @db.Text
+  noQuotation   Boolean        @default(false) @map("no_quotation") 
+  createdAt     DateTime       @default(now()) @map("created_at") @db.DateTime(0)
+  updatedAt     DateTime       @updatedAt @map("updated_at") @db.DateTime(0)
+
+  // Relasi
+  customer      Customer       @relation(fields: [customerId], references: [id])
+  items         InquiryItem[]
+
+  @@map("inquiries")
+}
+
+model InquiryItem {
+  id            String    @id @default(uuid()) @db.VarChar(36)
+  inquiryId     String    @map("inquiry_id") @db.VarChar(36)
+  supplierId    String?   @map("supplier_id") @db.VarChar(36)
+  itemId        String?   @map("item_id") @db.VarChar(36)
+
+  name          String    @db.VarChar(100)    
+  brand         String?   @db.VarChar(100)     
+  status        String?   @db.VarChar(50)      
+  qty           Int       @default(1)
+  unit          String?   @db.VarChar(20)      
+  hpp           Decimal?  @db.Decimal(18, 2)
+  markupPercent Decimal?  @map("markup_percent") @db.Decimal(5, 2)    
+  priceAfterUp  Decimal?  @map("price_after_up") @db.Decimal(18, 2) 
+  sellingPrice  Decimal?  @map("selling_price") @db.Decimal(18, 2) 
+  totalPrice    Decimal?  @map("total_price") @db.Decimal(18, 2)   
+  poPrice       Decimal?  @map("po_price") @db.Decimal(18, 2)      
+  notes         String?   @db.Text
+  deliveryTime  DateTime? @map("delivery_time")                    
+
+  // Relasi
+  inquiry       Inquiry   @relation(fields: [inquiryId], references: [id])
+  supplier      Supplier? @relation(fields: [supplierId], references: [id])
+  item          Item?     @relation(fields: [itemId], references: [id])
+
+  @@map("inquiry_items")
+}
+
+enum InquiryStatus {
+  PENDING
+  QUOTED
+  ORDERED
+  DELIVERED
+}
