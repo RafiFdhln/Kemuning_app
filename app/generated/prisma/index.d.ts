@@ -5344,6 +5344,7 @@ export namespace Prisma {
   export type InquiryItemAvgAggregateOutputType = {
     qty: number | null
     hpp: Decimal | null
+    totalHpp: Decimal | null
     markupPercent: Decimal | null
     priceAfterUp: Decimal | null
     sellingPrice: Decimal | null
@@ -5354,6 +5355,7 @@ export namespace Prisma {
   export type InquiryItemSumAggregateOutputType = {
     qty: number | null
     hpp: Decimal | null
+    totalHpp: Decimal | null
     markupPercent: Decimal | null
     priceAfterUp: Decimal | null
     sellingPrice: Decimal | null
@@ -5372,6 +5374,7 @@ export namespace Prisma {
     qty: number | null
     unit: string | null
     hpp: Decimal | null
+    totalHpp: Decimal | null
     markupPercent: Decimal | null
     priceAfterUp: Decimal | null
     sellingPrice: Decimal | null
@@ -5392,6 +5395,7 @@ export namespace Prisma {
     qty: number | null
     unit: string | null
     hpp: Decimal | null
+    totalHpp: Decimal | null
     markupPercent: Decimal | null
     priceAfterUp: Decimal | null
     sellingPrice: Decimal | null
@@ -5412,6 +5416,7 @@ export namespace Prisma {
     qty: number
     unit: number
     hpp: number
+    totalHpp: number
     markupPercent: number
     priceAfterUp: number
     sellingPrice: number
@@ -5426,6 +5431,7 @@ export namespace Prisma {
   export type InquiryItemAvgAggregateInputType = {
     qty?: true
     hpp?: true
+    totalHpp?: true
     markupPercent?: true
     priceAfterUp?: true
     sellingPrice?: true
@@ -5436,6 +5442,7 @@ export namespace Prisma {
   export type InquiryItemSumAggregateInputType = {
     qty?: true
     hpp?: true
+    totalHpp?: true
     markupPercent?: true
     priceAfterUp?: true
     sellingPrice?: true
@@ -5454,6 +5461,7 @@ export namespace Prisma {
     qty?: true
     unit?: true
     hpp?: true
+    totalHpp?: true
     markupPercent?: true
     priceAfterUp?: true
     sellingPrice?: true
@@ -5474,6 +5482,7 @@ export namespace Prisma {
     qty?: true
     unit?: true
     hpp?: true
+    totalHpp?: true
     markupPercent?: true
     priceAfterUp?: true
     sellingPrice?: true
@@ -5494,6 +5503,7 @@ export namespace Prisma {
     qty?: true
     unit?: true
     hpp?: true
+    totalHpp?: true
     markupPercent?: true
     priceAfterUp?: true
     sellingPrice?: true
@@ -5601,6 +5611,7 @@ export namespace Prisma {
     qty: number
     unit: string | null
     hpp: Decimal | null
+    totalHpp: Decimal | null
     markupPercent: Decimal | null
     priceAfterUp: Decimal | null
     sellingPrice: Decimal | null
@@ -5640,6 +5651,7 @@ export namespace Prisma {
     qty?: boolean
     unit?: boolean
     hpp?: boolean
+    totalHpp?: boolean
     markupPercent?: boolean
     priceAfterUp?: boolean
     sellingPrice?: boolean
@@ -5665,6 +5677,7 @@ export namespace Prisma {
     qty?: boolean
     unit?: boolean
     hpp?: boolean
+    totalHpp?: boolean
     markupPercent?: boolean
     priceAfterUp?: boolean
     sellingPrice?: boolean
@@ -5674,7 +5687,7 @@ export namespace Prisma {
     deliveryTime?: boolean
   }
 
-  export type InquiryItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "inquiryId" | "supplierId" | "itemId" | "name" | "brand" | "status" | "qty" | "unit" | "hpp" | "markupPercent" | "priceAfterUp" | "sellingPrice" | "totalPrice" | "poPrice" | "notes" | "deliveryTime", ExtArgs["result"]["inquiryItem"]>
+  export type InquiryItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "inquiryId" | "supplierId" | "itemId" | "name" | "brand" | "status" | "qty" | "unit" | "hpp" | "totalHpp" | "markupPercent" | "priceAfterUp" | "sellingPrice" | "totalPrice" | "poPrice" | "notes" | "deliveryTime", ExtArgs["result"]["inquiryItem"]>
   export type InquiryItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     inquiry?: boolean | InquiryDefaultArgs<ExtArgs>
     supplier?: boolean | InquiryItem$supplierArgs<ExtArgs>
@@ -5699,6 +5712,7 @@ export namespace Prisma {
       qty: number
       unit: string | null
       hpp: Prisma.Decimal | null
+      totalHpp: Prisma.Decimal | null
       markupPercent: Prisma.Decimal | null
       priceAfterUp: Prisma.Decimal | null
       sellingPrice: Prisma.Decimal | null
@@ -6088,6 +6102,7 @@ export namespace Prisma {
     readonly qty: FieldRef<"InquiryItem", 'Int'>
     readonly unit: FieldRef<"InquiryItem", 'String'>
     readonly hpp: FieldRef<"InquiryItem", 'Decimal'>
+    readonly totalHpp: FieldRef<"InquiryItem", 'Decimal'>
     readonly markupPercent: FieldRef<"InquiryItem", 'Decimal'>
     readonly priceAfterUp: FieldRef<"InquiryItem", 'Decimal'>
     readonly sellingPrice: FieldRef<"InquiryItem", 'Decimal'>
@@ -6572,6 +6587,7 @@ export namespace Prisma {
     qty: 'qty',
     unit: 'unit',
     hpp: 'hpp',
+    totalHpp: 'totalHpp',
     markupPercent: 'markupPercent',
     priceAfterUp: 'priceAfterUp',
     sellingPrice: 'sellingPrice',
@@ -7013,6 +7029,7 @@ export namespace Prisma {
     qty?: IntFilter<"InquiryItem"> | number
     unit?: StringNullableFilter<"InquiryItem"> | string | null
     hpp?: DecimalNullableFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
+    totalHpp?: DecimalNullableFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
     markupPercent?: DecimalNullableFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: DecimalNullableFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
     sellingPrice?: DecimalNullableFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
@@ -7036,6 +7053,7 @@ export namespace Prisma {
     qty?: SortOrder
     unit?: SortOrderInput | SortOrder
     hpp?: SortOrderInput | SortOrder
+    totalHpp?: SortOrderInput | SortOrder
     markupPercent?: SortOrderInput | SortOrder
     priceAfterUp?: SortOrderInput | SortOrder
     sellingPrice?: SortOrderInput | SortOrder
@@ -7063,6 +7081,7 @@ export namespace Prisma {
     qty?: IntFilter<"InquiryItem"> | number
     unit?: StringNullableFilter<"InquiryItem"> | string | null
     hpp?: DecimalNullableFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
+    totalHpp?: DecimalNullableFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
     markupPercent?: DecimalNullableFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: DecimalNullableFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
     sellingPrice?: DecimalNullableFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
@@ -7086,6 +7105,7 @@ export namespace Prisma {
     qty?: SortOrder
     unit?: SortOrderInput | SortOrder
     hpp?: SortOrderInput | SortOrder
+    totalHpp?: SortOrderInput | SortOrder
     markupPercent?: SortOrderInput | SortOrder
     priceAfterUp?: SortOrderInput | SortOrder
     sellingPrice?: SortOrderInput | SortOrder
@@ -7114,6 +7134,7 @@ export namespace Prisma {
     qty?: IntWithAggregatesFilter<"InquiryItem"> | number
     unit?: StringNullableWithAggregatesFilter<"InquiryItem"> | string | null
     hpp?: DecimalNullableWithAggregatesFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
+    totalHpp?: DecimalNullableWithAggregatesFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
     markupPercent?: DecimalNullableWithAggregatesFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: DecimalNullableWithAggregatesFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
     sellingPrice?: DecimalNullableWithAggregatesFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
@@ -7433,6 +7454,7 @@ export namespace Prisma {
     qty?: number
     unit?: string | null
     hpp?: Decimal | DecimalJsLike | number | string | null
+    totalHpp?: Decimal | DecimalJsLike | number | string | null
     markupPercent?: Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: Decimal | DecimalJsLike | number | string | null
     sellingPrice?: Decimal | DecimalJsLike | number | string | null
@@ -7456,6 +7478,7 @@ export namespace Prisma {
     qty?: number
     unit?: string | null
     hpp?: Decimal | DecimalJsLike | number | string | null
+    totalHpp?: Decimal | DecimalJsLike | number | string | null
     markupPercent?: Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: Decimal | DecimalJsLike | number | string | null
     sellingPrice?: Decimal | DecimalJsLike | number | string | null
@@ -7473,6 +7496,7 @@ export namespace Prisma {
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
     hpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalHpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     markupPercent?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     sellingPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -7496,6 +7520,7 @@ export namespace Prisma {
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
     hpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalHpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     markupPercent?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     sellingPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -7516,6 +7541,7 @@ export namespace Prisma {
     qty?: number
     unit?: string | null
     hpp?: Decimal | DecimalJsLike | number | string | null
+    totalHpp?: Decimal | DecimalJsLike | number | string | null
     markupPercent?: Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: Decimal | DecimalJsLike | number | string | null
     sellingPrice?: Decimal | DecimalJsLike | number | string | null
@@ -7533,6 +7559,7 @@ export namespace Prisma {
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
     hpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalHpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     markupPercent?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     sellingPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -7553,6 +7580,7 @@ export namespace Prisma {
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
     hpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalHpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     markupPercent?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     sellingPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -7970,6 +7998,7 @@ export namespace Prisma {
     qty?: SortOrder
     unit?: SortOrder
     hpp?: SortOrder
+    totalHpp?: SortOrder
     markupPercent?: SortOrder
     priceAfterUp?: SortOrder
     sellingPrice?: SortOrder
@@ -7982,6 +8011,7 @@ export namespace Prisma {
   export type InquiryItemAvgOrderByAggregateInput = {
     qty?: SortOrder
     hpp?: SortOrder
+    totalHpp?: SortOrder
     markupPercent?: SortOrder
     priceAfterUp?: SortOrder
     sellingPrice?: SortOrder
@@ -8000,6 +8030,7 @@ export namespace Prisma {
     qty?: SortOrder
     unit?: SortOrder
     hpp?: SortOrder
+    totalHpp?: SortOrder
     markupPercent?: SortOrder
     priceAfterUp?: SortOrder
     sellingPrice?: SortOrder
@@ -8020,6 +8051,7 @@ export namespace Prisma {
     qty?: SortOrder
     unit?: SortOrder
     hpp?: SortOrder
+    totalHpp?: SortOrder
     markupPercent?: SortOrder
     priceAfterUp?: SortOrder
     sellingPrice?: SortOrder
@@ -8032,6 +8064,7 @@ export namespace Prisma {
   export type InquiryItemSumOrderByAggregateInput = {
     qty?: SortOrder
     hpp?: SortOrder
+    totalHpp?: SortOrder
     markupPercent?: SortOrder
     priceAfterUp?: SortOrder
     sellingPrice?: SortOrder
@@ -8592,6 +8625,7 @@ export namespace Prisma {
     qty?: number
     unit?: string | null
     hpp?: Decimal | DecimalJsLike | number | string | null
+    totalHpp?: Decimal | DecimalJsLike | number | string | null
     markupPercent?: Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: Decimal | DecimalJsLike | number | string | null
     sellingPrice?: Decimal | DecimalJsLike | number | string | null
@@ -8613,6 +8647,7 @@ export namespace Prisma {
     qty?: number
     unit?: string | null
     hpp?: Decimal | DecimalJsLike | number | string | null
+    totalHpp?: Decimal | DecimalJsLike | number | string | null
     markupPercent?: Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: Decimal | DecimalJsLike | number | string | null
     sellingPrice?: Decimal | DecimalJsLike | number | string | null
@@ -8662,6 +8697,7 @@ export namespace Prisma {
     qty?: IntFilter<"InquiryItem"> | number
     unit?: StringNullableFilter<"InquiryItem"> | string | null
     hpp?: DecimalNullableFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
+    totalHpp?: DecimalNullableFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
     markupPercent?: DecimalNullableFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: DecimalNullableFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
     sellingPrice?: DecimalNullableFilter<"InquiryItem"> | Decimal | DecimalJsLike | number | string | null
@@ -8744,6 +8780,7 @@ export namespace Prisma {
     qty?: number
     unit?: string | null
     hpp?: Decimal | DecimalJsLike | number | string | null
+    totalHpp?: Decimal | DecimalJsLike | number | string | null
     markupPercent?: Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: Decimal | DecimalJsLike | number | string | null
     sellingPrice?: Decimal | DecimalJsLike | number | string | null
@@ -8765,6 +8802,7 @@ export namespace Prisma {
     qty?: number
     unit?: string | null
     hpp?: Decimal | DecimalJsLike | number | string | null
+    totalHpp?: Decimal | DecimalJsLike | number | string | null
     markupPercent?: Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: Decimal | DecimalJsLike | number | string | null
     sellingPrice?: Decimal | DecimalJsLike | number | string | null
@@ -8831,6 +8869,7 @@ export namespace Prisma {
     qty?: number
     unit?: string | null
     hpp?: Decimal | DecimalJsLike | number | string | null
+    totalHpp?: Decimal | DecimalJsLike | number | string | null
     markupPercent?: Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: Decimal | DecimalJsLike | number | string | null
     sellingPrice?: Decimal | DecimalJsLike | number | string | null
@@ -8852,6 +8891,7 @@ export namespace Prisma {
     qty?: number
     unit?: string | null
     hpp?: Decimal | DecimalJsLike | number | string | null
+    totalHpp?: Decimal | DecimalJsLike | number | string | null
     markupPercent?: Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: Decimal | DecimalJsLike | number | string | null
     sellingPrice?: Decimal | DecimalJsLike | number | string | null
@@ -9102,6 +9142,7 @@ export namespace Prisma {
     qty?: number
     unit?: string | null
     hpp?: Decimal | DecimalJsLike | number | string | null
+    totalHpp?: Decimal | DecimalJsLike | number | string | null
     markupPercent?: Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: Decimal | DecimalJsLike | number | string | null
     sellingPrice?: Decimal | DecimalJsLike | number | string | null
@@ -9119,6 +9160,7 @@ export namespace Prisma {
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
     hpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalHpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     markupPercent?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     sellingPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -9140,6 +9182,7 @@ export namespace Prisma {
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
     hpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalHpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     markupPercent?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     sellingPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -9159,6 +9202,7 @@ export namespace Prisma {
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
     hpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalHpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     markupPercent?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     sellingPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -9224,6 +9268,7 @@ export namespace Prisma {
     qty?: number
     unit?: string | null
     hpp?: Decimal | DecimalJsLike | number | string | null
+    totalHpp?: Decimal | DecimalJsLike | number | string | null
     markupPercent?: Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: Decimal | DecimalJsLike | number | string | null
     sellingPrice?: Decimal | DecimalJsLike | number | string | null
@@ -9241,6 +9286,7 @@ export namespace Prisma {
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
     hpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalHpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     markupPercent?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     sellingPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -9262,6 +9308,7 @@ export namespace Prisma {
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
     hpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalHpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     markupPercent?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     sellingPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -9281,6 +9328,7 @@ export namespace Prisma {
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
     hpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalHpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     markupPercent?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     sellingPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -9300,6 +9348,7 @@ export namespace Prisma {
     qty?: number
     unit?: string | null
     hpp?: Decimal | DecimalJsLike | number | string | null
+    totalHpp?: Decimal | DecimalJsLike | number | string | null
     markupPercent?: Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: Decimal | DecimalJsLike | number | string | null
     sellingPrice?: Decimal | DecimalJsLike | number | string | null
@@ -9317,6 +9366,7 @@ export namespace Prisma {
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
     hpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalHpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     markupPercent?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     sellingPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -9338,6 +9388,7 @@ export namespace Prisma {
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
     hpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalHpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     markupPercent?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     sellingPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -9357,6 +9408,7 @@ export namespace Prisma {
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
     hpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalHpp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     markupPercent?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     priceAfterUp?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     sellingPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null

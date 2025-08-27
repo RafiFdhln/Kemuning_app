@@ -172,6 +172,7 @@ exports.Prisma.InquiryItemScalarFieldEnum = {
   qty: 'qty',
   unit: 'unit',
   hpp: 'hpp',
+  totalHpp: 'totalHpp',
   markupPercent: 'markupPercent',
   priceAfterUp: 'priceAfterUp',
   sellingPrice: 'sellingPrice',

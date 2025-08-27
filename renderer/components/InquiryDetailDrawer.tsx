@@ -2,6 +2,15 @@ import { Drawer, Box, Typography, Divider, Table, TableBody, TableCell, TableHea
 
 const InquiryDetailDrawer = ({ open, onClose, inquiry }) => {
   if (!inquiry) return null;
+  
+  // Debug: Log inquiry data to see supplier information
+  console.log('InquiryDetailDrawer - inquiry data:', inquiry);
+  console.log('InquiryDetailDrawer - items with supplier:', inquiry.items?.map(item => ({
+    name: item.name,
+    supplierId: item.supplierId,
+    supplierName: item.supplierName,
+    supplier: item.supplier
+  })));
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose} PaperProps={{ sx: { minWidth: 500, p: 3 } }}>
@@ -22,8 +31,12 @@ const InquiryDetailDrawer = ({ open, onClose, inquiry }) => {
               <TableCell>Nama</TableCell>
               <TableCell>Brand</TableCell>
               <TableCell>Qty</TableCell>
-              <TableCell>Unit</TableCell>
+              <TableCell>Satuan</TableCell>
+              <TableCell>HPP/Satuan</TableCell>
+              <TableCell>TOTAL HPP</TableCell>
+              <TableCell>Markup %</TableCell>
               <TableCell>Harga Jual</TableCell>
+              <TableCell>Total</TableCell>
               <TableCell>Supplier</TableCell>
             </TableRow>
           </TableHead>
@@ -34,8 +47,12 @@ const InquiryDetailDrawer = ({ open, onClose, inquiry }) => {
                 <TableCell>{item.brand}</TableCell>
                 <TableCell>{item.qty}</TableCell>
                 <TableCell>{item.unit}</TableCell>
+                <TableCell>{item.hpp}</TableCell>
+                <TableCell>{item.totalHpp || (item.qty * item.hpp)}</TableCell>
+                <TableCell>{item.markupPercent}%</TableCell>
                 <TableCell>{item.sellingPrice}</TableCell>
-                <TableCell>{item.supplierName}</TableCell>
+                <TableCell>{item.totalPrice}</TableCell>
+                <TableCell>{item.supplierName || (item.supplier?.name) || '-'}</TableCell>
               </TableRow>
             ))}
           </TableBody>

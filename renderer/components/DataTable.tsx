@@ -20,6 +20,9 @@ const DataTable = <TData,>({
     columns={columns}
     data={data}
     enablePagination
+    enableGlobalFilter={showGlobalFilter}
+    enableColumnFilters={showGlobalFilter}
+    globalFilterFn="contains"
     muiTablePaperProps={{
       elevation: 0,
     }}

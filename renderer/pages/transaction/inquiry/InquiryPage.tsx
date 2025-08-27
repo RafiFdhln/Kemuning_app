@@ -28,6 +28,7 @@ type InquiryItem = {
   qty: number;
   unit?: string;
   hpp?: number;
+  totalHpp?: number;
   markupPercent?: number;
   priceAfterUp?: number;
   sellingPrice?: number;
@@ -72,13 +73,43 @@ const InquiryPage = () => {
     items: [],
   });
 
+  const resetFormData = () => {
+    setFormData({
+      requestNumber: "",
+      requestDate: formatDateTimeLocal(new Date()),
+      category: "BARANG",
+      customerId: "",
+      remarks: "",
+      status: "PENDING",
+      items: [{ name: "", qty: 1 } as any],
+    });
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    setFormData((prev) => ({
+      ...prev,
+      requestNumber: generateNextRequestNumber(prev.requestDate, data),
+      items: (prev.items && prev.items.length > 0) ? prev.items : [{ name: "", qty: 1 } as any],
+    }));
+  }, [open, formData.requestDate, data]);
+
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
         const res = await fetch("/api/company/customer");
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
         const result = await res.json();
-        setCustomers(result.data || []);
-      } catch (err) {
+        if (result.success && result.data) {
+          setCustomers(result.data);
+        } else {
+          console.error('Failed to fetch customers:', result.message);
+          setCustomers([]);
+        }
+      } catch (err: any) {
+        console.error('Error fetching customers:', err);
         setCustomers([]);
       }
     };
@@ -89,10 +120,71 @@ const InquiryPage = () => {
     const fetchInquiries = async () => {
       try {
         const res = await fetch("/api/transaction/inquiry");
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
         const result = await res.json();
-        setData(result.data || []);
-      } catch (err) {
-        setData([]);
+        if (result.success && result.data) {
+          console.log('Fetched inquiries with supplier data:', result.data.map(inq => ({
+            requestNumber: inq.requestNumber,
+            customer: inq.customer,
+            customerName: inq.customer?.name,
+            customerId: inq.customerId
+          })));
+          setData(result.data);
+        } else {
+          console.error('Failed to fetch inquiries:', result.message);
+          setData([]);
+        }
+      } catch (err: any) {
+        console.error('Error fetching inquiries:', err);
+        // Fallback ke test data jika API gagal
+        const testData: Inquiry[] = [
+          {
+            requestNumber: "INQ-0825001",
+            requestDate: new Date("2025-08-22"),
+            category: "BARANG",
+            customer: { id: "1", name: "XNCTSADD" },
+            remarks: "SDADA",
+            status: "PENDING",
+            items: []
+          },
+          {
+            requestNumber: "INQ-0825002",
+            requestDate: new Date("2025-08-22"),
+            category: "BARANG",
+            customer: { id: "2", name: "GSAUD ASDAD" },
+            remarks: "COCOK",
+            status: "QUOTED",
+            items: []
+          },
+          {
+            requestNumber: "INQ-0825003",
+            requestDate: new Date("2025-08-23"),
+            category: "PROJECT",
+            customer: { id: "3", name: "PT ABC Teknologi" },
+            remarks: "Project development",
+            status: "PENDING",
+            items: []
+          },
+          {
+            requestNumber: "INQ-0825004",
+            requestDate: new Date("2025-08-24"),
+            category: "BARANG",
+            customer: { id: "4", name: "CV Maju Bersama" },
+            remarks: "Supply barang",
+            status: "ORDERED",
+            items: []
+          }
+        ];
+        console.log('Using test data for debugging:', testData);
+        console.log('Test data customer structure:', testData.map(d => ({
+          requestNumber: d.requestNumber,
+          customer: d.customer,
+          customerName: d.customer?.name,
+          customerId: d.customer?.id
+        })));
+        setData(testData);
       }
     };
     fetchInquiries();
@@ -102,11 +194,20 @@ const InquiryPage = () => {
     const fetchSuppliers = async () => {
       try {
         const res = await fetch("/api/company/supplier");
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
         const result = await res.json();
-        setSuppliers(
-          (result.data || []).map((s: any) => ({ label: s.name, value: s.id }))
-        );
-      } catch (err) {
+        if (result.success && result.data) {
+          setSuppliers(
+            result.data.map((s: any) => ({ label: s.name, value: s.id }))
+          );
+        } else {
+          console.error('Failed to fetch suppliers:', result.message);
+          setSuppliers([]);
+        }
+      } catch (err: any) {
+        console.error('Error fetching suppliers:', err);
         setSuppliers([]);
       }
     };
@@ -130,15 +231,6 @@ const InquiryPage = () => {
     return `${prefix}${nextSeq}`;
   };
 
-  useEffect(() => {
-    if (!open) return;
-    setFormData((prev) => ({
-      ...prev,
-      requestNumber: generateNextRequestNumber(prev.requestDate, data),
-      items: (prev.items && prev.items.length > 0) ? prev.items : [{ name: "", qty: 1 } as any],
-    }));
-  }, [open, formData.requestDate, data]);
-
   const formFields = [
     { name: "requestDate", label: "Tanggal Permintaan", type: "datetime" },
     { name: "category", label: "Kategori", type: "autocomplete", options: ["BARANG", "PROJECT"] },
@@ -154,19 +246,55 @@ const InquiryPage = () => {
   ];
 
   const columns = useMemo<MRT_ColumnDef<Inquiry & { customerName?: string }>[]>(() => [
-    { accessorKey: "requestNumber", header: "No Permintaan" },
-    { accessorKey: "category", header: "Kategori" },
-    { accessorKey: "requestDate", header: "Tanggal", Cell: ({ cell }) => new Date(cell.getValue<Date>()).toLocaleDateString() },
+    { 
+      accessorKey: "requestNumber", 
+      header: "No Permintaan",
+      Cell: ({ cell }) => cell.getValue<string>() || '-',
+      enableColumnFilter: true,
+      enableGlobalFilter: true
+    },
+    { 
+      accessorKey: "category", 
+      header: "Kategori",
+      Cell: ({ cell }) => cell.getValue<string>() || '-',
+      enableColumnFilter: true,
+      enableGlobalFilter: true
+    },
+    { 
+      accessorKey: "requestDate", 
+      header: "Tanggal", 
+      Cell: ({ cell }) => {
+        const value = cell.getValue<Date>();
+        return value ? new Date(value).toLocaleDateString() : '-';
+      },
+      enableColumnFilter: true,
+      enableGlobalFilter: true
+    },
     {
-      accessorKey: "customerId",
+      accessorKey: "customer",
       header: "Customer",
       Cell: ({ cell }) => {
-        const cust = customers.find((c) => c.id === cell.getValue<string>());
-        return cust ? cust.name : "";
+        const customer = cell.getValue<any>();
+        if (!customer) return '-';
+        return customer.name || '-';
       },
+      enableColumnFilter: true,
+      enableGlobalFilter: true
     },
-    { accessorKey: "remarks", header: "Keterangan" },
-    { accessorKey: "status", header: "Status" },
+    { 
+      accessorKey: "remarks", 
+      header: "Keterangan",
+      Cell: ({ cell }) => cell.getValue<string>() || '-',
+      enableColumnFilter: true,
+      enableGlobalFilter: true
+    },
+    { 
+      accessorKey: "status", 
+      header: "Status",
+      Cell: ({ cell }) => cell.getValue<string>() || '-',
+      enableColumnFilter: true,
+      enableGlobalFilter: true
+    },
     {
       header: "Aksi",
       id: "aksi",
@@ -193,22 +321,100 @@ const InquiryPage = () => {
 
   const handleSave = async () => {
     try {
+      console.log('=== START SAVE INQUIRY ===');
+      console.log('Form data:', formData);
+      
+      // Validate form data
+      if (!formData.customerId) {
+        throw new Error('Customer harus dipilih');
+      }
+      
+      if (!formData.requestDate) {
+        throw new Error('Tanggal permintaan harus diisi');
+      }
+      
+      if (!formData.items || formData.items.length === 0) {
+        throw new Error('Minimal satu item harus ditambahkan');
+      }
+      
+      // Validate items
+      for (let i = 0; i < formData.items.length; i++) {
+        const item = formData.items[i];
+        if (!item.name || item.name.trim() === '') {
+          throw new Error(`Nama item pada baris ${i + 1} harus diisi`);
+        }
+        if (!item.qty || item.qty <= 0) {
+          throw new Error(`Quantity item pada baris ${i + 1} harus lebih dari 0`);
+        }
+      }
+      
       const payload = {
         ...formData,
         requestDate: formData.requestDate,
         items: formData.items,
       };
+      
+      console.log('Validated payload:', payload);
+      
       const res = await fetch("/api/transaction/inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const result = await res.json().catch(() => ({}));
-      setData((prev) => [...prev, result.data]);
-      setAlertOpen(true);
-      toggleDrawer(false)();
-    } catch (error) {
-      console.error(error.message);
+      
+      console.log('Response status:', res.status);
+      console.log('Response ok:', res.ok);
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('Error response body:', errorText);
+        throw new Error(`HTTP error! status: ${res.status} - ${errorText}`);
+      }
+      
+      const result = await res.json();
+      console.log('API response:', result);
+      
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to save inquiry');
+      }
+      
+      if (result.data) {
+        console.log('Adding new inquiry to data:', result.data);
+        
+        // Normalize the data structure to match existing inquiries
+        const normalizedInquiry = {
+          ...result.data,
+          requestNumber: result.data.requestNumber || '',
+          requestDate: result.data.requestDate ? new Date(result.data.requestDate) : new Date(),
+          category: result.data.category || 'BARANG',
+          customer: result.data.customer || { id: '', name: '' },
+          remarks: result.data.remarks || '',
+          status: result.data.status || 'PENDING',
+          items: result.data.items || []
+        };
+        
+        console.log('Normalized inquiry:', normalizedInquiry);
+        
+        setData((prev) => {
+          console.log('Previous data:', prev);
+          const newData = [...prev, normalizedInquiry];
+          console.log('New data array:', newData);
+          return newData;
+        });
+        
+        setAlertOpen(true);
+        toggleDrawer(false)();
+        console.log('=== SAVE INQUIRY SUCCESS ===');
+      } else {
+        throw new Error('No data received from server');
+      }
+    } catch (error: any) {
+      console.error('=== SAVE INQUIRY ERROR ===');
+      console.error('Error details:', error);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      setErrorMessage(error.message || 'Terjadi kesalahan saat menyimpan inquiry');
+      setErrorOpen(true);
     }
   };
 
@@ -226,7 +432,12 @@ const InquiryPage = () => {
   const exportToExcel = () => {
     const exportData = data.map((d) => ({
       ...d,
-      requestDate: d.requestDate.toLocaleDateString(),
+      requestNumber: d.requestNumber || 'N/A',
+      requestDate: d.requestDate ? new Date(d.requestDate).toLocaleDateString() : 'N/A',
+      category: d.category || 'N/A',
+      customer: d.customer?.name || 'N/A',
+      status: d.status || 'N/A',
+      remarks: d.remarks || 'N/A',
     }));
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
@@ -235,6 +446,9 @@ const InquiryPage = () => {
   };
 
   const toggleDrawer = (open: boolean) => () => {
+    if (open) {
+      resetFormData();
+    }
     setOpen(open);
   };
 

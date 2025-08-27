@@ -89,6 +89,7 @@ model InquiryItem {
   qty           Int       @default(1)
   unit          String?   @db.VarChar(20)      
   hpp           Decimal?  @db.Decimal(18, 2)
+  totalHpp      Decimal?  @map("total_hpp") @db.Decimal(18, 2)
   markupPercent Decimal?  @map("markup_percent") @db.Decimal(5, 2)    
   priceAfterUp  Decimal?  @map("price_after_up") @db.Decimal(18, 2) 
   sellingPrice  Decimal?  @map("selling_price") @db.Decimal(18, 2) 
