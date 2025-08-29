@@ -182,6 +182,28 @@ exports.Prisma.InquiryItemScalarFieldEnum = {
   deliveryTime: 'deliveryTime'
 };
 
+exports.Prisma.QuotationScalarFieldEnum = {
+  id: 'id',
+  quotationNumber: 'quotationNumber',
+  inquiryId: 'inquiryId',
+  customerId: 'customerId',
+  status: 'status',
+  remarks: 'remarks',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.QuotationItemScalarFieldEnum = {
+  id: 'id',
+  quotationId: 'quotationId',
+  inquiryItemId: 'inquiryItemId',
+  name: 'name',
+  qty: 'qty',
+  price: 'price',
+  totalPrice: 'totalPrice',
+  remarks: 'remarks'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -237,6 +259,23 @@ exports.Prisma.InquiryItemOrderByRelevanceFieldEnum = {
   unit: 'unit',
   notes: 'notes'
 };
+
+exports.Prisma.QuotationOrderByRelevanceFieldEnum = {
+  id: 'id',
+  quotationNumber: 'quotationNumber',
+  inquiryId: 'inquiryId',
+  customerId: 'customerId',
+  status: 'status',
+  remarks: 'remarks'
+};
+
+exports.Prisma.QuotationItemOrderByRelevanceFieldEnum = {
+  id: 'id',
+  quotationId: 'quotationId',
+  inquiryItemId: 'inquiryItemId',
+  name: 'name',
+  remarks: 'remarks'
+};
 exports.ItemType = exports.$Enums.ItemType = {
   GOODS: 'GOODS',
   SERVICE: 'SERVICE'
@@ -259,7 +298,9 @@ exports.Prisma.ModelName = {
   Customer: 'Customer',
   Supplier: 'Supplier',
   Inquiry: 'Inquiry',
-  InquiryItem: 'InquiryItem'
+  InquiryItem: 'InquiryItem',
+  Quotation: 'Quotation',
+  QuotationItem: 'QuotationItem'
 };
 
 /**

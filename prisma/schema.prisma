@@ -32,15 +32,16 @@ enum ItemType {
 }
 
 model Customer {
-  id        String   @id @default(uuid()) @db.VarChar(36)
-  code      String   @unique @db.VarChar(20)
-  name      String   @db.VarChar(100)
-  npwp      String?  @unique @db.VarChar(20)
-  address   String?  @db.VarChar(255)
-  remarks   String?  @db.VarChar(255)
+  id        String     @id @default(uuid()) @db.VarChar(36)
+  code      String     @unique @db.VarChar(20)
+  name      String     @db.VarChar(100)
+  npwp      String?    @unique @db.VarChar(20)
+  address   String?    @db.VarChar(255)
+  remarks   String?    @db.VarChar(255)
 
   // Relasi
-  inquiries Inquiry[]
+  inquiries   Inquiry[]
+  quotations  Quotation[]
 
   @@map("customers")
 }
@@ -73,6 +74,7 @@ model Inquiry {
   // Relasi
   customer      Customer       @relation(fields: [customerId], references: [id])
   items         InquiryItem[]
+  quotations    Quotation[]
 
   @@map("inquiries")
 }
@@ -102,6 +104,7 @@ model InquiryItem {
   inquiry       Inquiry   @relation(fields: [inquiryId], references: [id])
   supplier      Supplier? @relation(fields: [supplierId], references: [id])
   item          Item?     @relation(fields: [itemId], references: [id])
+  quotationItems QuotationItem[]
 
   @@map("inquiry_items")
 }
@@ -116,4 +119,39 @@ enum InquiryStatus {
 enum InquiryCategory {
   BARANG
   PROJECT
+}
+
+model Quotation {
+  id              String        @id @default(uuid()) @db.VarChar(36)
+  quotationNumber String        @unique @db.VarChar(50)
+  inquiryId       String        @db.VarChar(36)
+  customerId      String        @db.VarChar(36)
+  status          String        @default("DRAFT")
+  remarks         String?       @db.Text
+  createdAt       DateTime      @default(now()) @db.DateTime(0)
+  updatedAt       DateTime      @updatedAt @db.DateTime(0)
+
+  // Relasi
+  inquiry         Inquiry       @relation(fields: [inquiryId], references: [id])
+  customer        Customer      @relation(fields: [customerId], references: [id])
+  items           QuotationItem[]
+
+  @@map("quotations")
+}
+
+model QuotationItem {
+  id            String      @id @default(uuid()) @db.VarChar(36)
+  quotationId   String      @db.VarChar(36)
+  inquiryItemId String?     @db.VarChar(36)
+  name          String      @db.VarChar(100)
+  qty           Int         @default(1)
+  price         Decimal?    @db.Decimal(18, 2)
+  totalPrice    Decimal?    @db.Decimal(18, 2)
+  remarks       String?     @db.Text
+
+  // Relasi
+  quotation     Quotation   @relation(fields: [quotationId], references: [id])
+  inquiryItem   InquiryItem? @relation(fields: [inquiryItemId], references: [id])
+
+  @@map("quotation_items")
 }

@@ -40,7 +40,8 @@ model Customer {
   remarks String? @db.VarChar(255)
 
   // Relasi
-  inquiries Inquiry[]
+  inquiries  Inquiry[]
+  quotations Quotation[]
 
   @@map("customers")
 }
@@ -60,19 +61,20 @@ model Supplier {
 }
 
 model Inquiry {
-  id            String        @id @default(uuid()) @db.VarChar(36)
-  requestNumber String?       @unique @map("request_number") @db.VarChar(50) // NO. SURAT PERMINTAAN
-  requestDate   DateTime      @map("request_date") @db.Date
-  customerId    String        @map("customer_id") @db.VarChar(36)
-  status        InquiryStatus @default(PENDING)
-  remarks       String?       @db.Text
-  noQuotation   Boolean       @default(false) @map("no_quotation")
-  createdAt     DateTime      @default(now()) @map("created_at") @db.DateTime(0)
-  updatedAt     DateTime      @updatedAt @map("updated_at") @db.DateTime(0)
+  id            String          @id @default(uuid()) @db.VarChar(36)
+  requestNumber String?         @unique @map("request_number") @db.VarChar(50)
+  category      InquiryCategory @default(BARANG)
+  requestDate   DateTime        @map("request_date") @db.Date
+  customerId    String          @map("customer_id") @db.VarChar(36)
+  status        InquiryStatus   @default(PENDING)
+  remarks       String?         @db.Text
+  createdAt     DateTime        @default(now()) @map("created_at") @db.DateTime(0)
+  updatedAt     DateTime        @updatedAt @map("updated_at") @db.DateTime(0)
 
   // Relasi
-  customer Customer      @relation(fields: [customerId], references: [id])
-  items    InquiryItem[]
+  customer   Customer      @relation(fields: [customerId], references: [id])
+  items      InquiryItem[]
+  quotations Quotation[]
 
   @@map("inquiries")
 }
@@ -89,6 +91,7 @@ model InquiryItem {
   qty           Int       @default(1)
   unit          String?   @db.VarChar(20)
   hpp           Decimal?  @db.Decimal(18, 2)
+  totalHpp      Decimal?  @map("total_hpp") @db.Decimal(18, 2)
   markupPercent Decimal?  @map("markup_percent") @db.Decimal(5, 2)
   priceAfterUp  Decimal?  @map("price_after_up") @db.Decimal(18, 2)
   sellingPrice  Decimal?  @map("selling_price") @db.Decimal(18, 2)
@@ -98,9 +101,10 @@ model InquiryItem {
   deliveryTime  DateTime? @map("delivery_time")
 
   // Relasi
-  inquiry  Inquiry   @relation(fields: [inquiryId], references: [id])
-  supplier Supplier? @relation(fields: [supplierId], references: [id])
-  item     Item?     @relation(fields: [itemId], references: [id])
+  inquiry        Inquiry         @relation(fields: [inquiryId], references: [id])
+  supplier       Supplier?       @relation(fields: [supplierId], references: [id])
+  item           Item?           @relation(fields: [itemId], references: [id])
+  quotationItems QuotationItem[]
 
   @@map("inquiry_items")
 }
@@ -110,4 +114,44 @@ enum InquiryStatus {
   QUOTED
   ORDERED
   DELIVERED
+}
+
+enum InquiryCategory {
+  BARANG
+  PROJECT
+}
+
+model Quotation {
+  id              String   @id @default(uuid()) @db.VarChar(36)
+  quotationNumber String   @unique @db.VarChar(50)
+  inquiryId       String   @db.VarChar(36)
+  customerId      String   @db.VarChar(36)
+  status          String   @default("DRAFT")
+  remarks         String?  @db.Text
+  createdAt       DateTime @default(now()) @db.DateTime(0)
+  updatedAt       DateTime @updatedAt @db.DateTime(0)
+
+  // Relasi
+  inquiry  Inquiry         @relation(fields: [inquiryId], references: [id])
+  customer Customer        @relation(fields: [customerId], references: [id])
+  items    QuotationItem[]
+
+  @@map("quotations")
+}
+
+model QuotationItem {
+  id            String   @id @default(uuid()) @db.VarChar(36)
+  quotationId   String   @db.VarChar(36)
+  inquiryItemId String?  @db.VarChar(36)
+  name          String   @db.VarChar(100)
+  qty           Int      @default(1)
+  price         Decimal? @db.Decimal(18, 2)
+  totalPrice    Decimal? @db.Decimal(18, 2)
+  remarks       String?  @db.Text
+
+  // Relasi
+  quotation   Quotation    @relation(fields: [quotationId], references: [id])
+  inquiryItem InquiryItem? @relation(fields: [inquiryItemId], references: [id])
+
+  @@map("quotation_items")
 }

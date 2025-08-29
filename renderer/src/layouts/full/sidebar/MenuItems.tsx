@@ -61,12 +61,12 @@ const Menuitems = [
     icon: IconCashBanknote,
     href: "/transaction/inquiry/InquiryPage",
   },
-  // {
-  //   id: uniqueId(),
-  //   title: "Penjualan",
-  //   icon: IconShoppingCartDollar,
-  //   href: "/transaction/sell/SellPage",
-  // },
+  {
+    id: uniqueId(),
+    title: "Quotation",
+    icon: IconShoppingCartDollar,
+    href: "/transaction/quotation/QuotationPage",
+  },
   // {
   //   id: uniqueId(),
   //   title: "Pembelian",
