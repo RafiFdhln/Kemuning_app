@@ -10,21 +10,15 @@ import { useEffect } from "react";
 
 type InquiryItemForm = {
   name: string;
-  brand?: string;
+  detail?: string;
   status?: string;
   qty: number;
   unit?: string;
   hpp?: number;
-  markupPercent?: number;
-  priceAfterUp?: number;
-  sellingPrice?: number;
-  totalPrice?: number;
-  poPrice?: number;
-  notes?: string;
+  totalHpp?: number;
   deliveryTime?: string;
   supplierId?: string;
   supplierName?: string; 
-  totalHpp?: number;
 };
 
 interface ItemsTableProps {
@@ -37,47 +31,38 @@ const ItemsTable: React.FC<ItemsTableProps> = ({ items, onChange, suppliers }) =
   const calculateValues = (item: InquiryItemForm) => {
     const qty = item.qty || 0;
     const hpp = item.hpp || 0;
-    const markupPercent = item.markupPercent || 0;
     
     const totalHpp = qty * hpp;
-    const sellingPrice = totalHpp + (totalHpp * markupPercent / 100);
-    const totalPrice = sellingPrice * qty;
     
-    return { totalHpp, sellingPrice, totalPrice };
+    return { totalHpp };
   };
 
   useEffect(() => {
     const updatedItems = items.map(item => {
-      const { totalHpp, sellingPrice, totalPrice } = calculateValues(item);
+      const { totalHpp } = calculateValues(item);
       return {
         ...item,
         totalHpp,
-        sellingPrice: sellingPrice > 0 ? sellingPrice : item.sellingPrice,
-        totalPrice: totalPrice > 0 ? totalPrice : item.totalPrice
       };
     });
     
     const hasChanges = updatedItems.some((item, index) => {
       const original = items[index];
-      return item.totalHpp !== original.totalHpp || 
-             item.sellingPrice !== original.sellingPrice || 
-             item.totalPrice !== original.totalPrice;
+      return item.totalHpp !== original.totalHpp;
     });
     
     if (hasChanges) {
       onChange(updatedItems);
     }
-  }, [items.map(item => `${item.qty}-${item.hpp}-${item.markupPercent}`).join(',')]);
+  }, [items.map(item => `${item.qty}-${item.hpp}`).join(',')]);
 
   const handleChange = (index: number, field: keyof InquiryItemForm, value: any) => {
     const newItems = [...items];
     (newItems[index] as any)[field] = value;
     
-    if (field === 'qty' || field === 'hpp' || field === 'markupPercent') {
-      const { totalHpp, sellingPrice, totalPrice } = calculateValues(newItems[index]);
+    if (field === 'qty' || field === 'hpp') {
+      const { totalHpp } = calculateValues(newItems[index]);
       newItems[index].totalHpp = totalHpp;
-      newItems[index].sellingPrice = sellingPrice;
-      newItems[index].totalPrice = totalPrice;
     }
     
     onChange(newItems);
@@ -100,15 +85,12 @@ const ItemsTable: React.FC<ItemsTableProps> = ({ items, onChange, suppliers }) =
           <TableRow>
             <TableCell sx={{ minWidth: 150 }}>Nama</TableCell>
             <TableCell sx={{ minWidth: 200 }}>Supplier</TableCell>
-            <TableCell sx={{ minWidth: 100 }}>Brand</TableCell>
+            <TableCell sx={{ minWidth: 100 }}>Detail</TableCell>
             <TableCell sx={{ width: 50 }}>Qty</TableCell>
             <TableCell sx={{ width: 75 }}>Satuan</TableCell>
             <TableCell sx={{ width: 150 }}>HPP/Satuan</TableCell>
             <TableCell sx={{ width: 100 }}>TOTAL HPP</TableCell>
-            <TableCell sx={{ width: 80 }}>Markup %</TableCell>
-            <TableCell sx={{ width: 150 }}>Harga Jual</TableCell>
-            <TableCell sx={{ width: 150 }}>Total</TableCell>
-            <TableCell sx={{ minWidth: 150 }}>Catatan</TableCell>
+            <TableCell sx={{ minWidth: 150 }}>Status</TableCell>
             <TableCell>Aksi</TableCell>
           </TableRow>
         </TableHead>
@@ -127,6 +109,7 @@ const ItemsTable: React.FC<ItemsTableProps> = ({ items, onChange, suppliers }) =
               </TableCell>
               <TableCell>
                 <Autocomplete
+                  size="small"
                   options={suppliers || []}
                   value={(suppliers || []).find((s) => s.value === item.supplierId) || null}
                   onChange={(_e, value) => {
@@ -153,9 +136,9 @@ const ItemsTable: React.FC<ItemsTableProps> = ({ items, onChange, suppliers }) =
                 <TextField
                   variant="standard"
                   size="small"
-                  value={item.brand || ""}
+                  value={item.detail || ""}
                   placeholder="Brand"
-                  onChange={(e) => handleChange(index, "brand", e.target.value)}
+                  onChange={(e) => handleChange(index, "detail", e.target.value)}
                 />
               </TableCell>
               <TableCell>
@@ -213,45 +196,21 @@ const ItemsTable: React.FC<ItemsTableProps> = ({ items, onChange, suppliers }) =
                 />
               </TableCell>
               <TableCell>
-                <TextField
-                  type="number"
-                  variant="standard"
+                <Autocomplete
                   size="small"
-                  value={item.markupPercent || ""}
-                  placeholder="%"
-                  onChange={(e) => handleChange(index, "markupPercent", parseFloat(e.target.value))}
-                  sx={{ width: 80 }}
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  type="number"
-                  variant="standard"
-                  size="small"
-                  value={item.sellingPrice || 0}
-                  placeholder="Harga Jual"
-                  InputProps={{ readOnly: true }}
-                  sx={{ width: 100, backgroundColor: '#f5f5f5' }}
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  type="number"
-                  variant="standard"
-                  size="small"
-                  value={item.totalPrice || 0}
-                  placeholder="Total"
-                  InputProps={{ readOnly: true }}
-                  sx={{ width: 100, backgroundColor: '#f5f5f5' }}
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  variant="standard"
-                  size="small"
-                  value={item.notes || ""}
-                  placeholder="Catatan"
-                  onChange={(e) => handleChange(index, "notes", e.target.value)}
+                  options={["READY", "UNREADY"]}
+                  value={item.status || ""}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      variant="standard"
+                      size="small"
+                      placeholder="Status"
+                    />
+                  )}
+                  onChange={(event, newValue) => {
+                    handleChange(index, "status", newValue || "");
+                  }}
                   sx={{ minWidth: 120 }}
                 />
               </TableCell>

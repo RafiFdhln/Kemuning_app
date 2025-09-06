@@ -167,7 +167,7 @@ exports.Prisma.InquiryItemScalarFieldEnum = {
   supplierId: 'supplierId',
   itemId: 'itemId',
   name: 'name',
-  brand: 'brand',
+  detail: 'detail',
   status: 'status',
   qty: 'qty',
   unit: 'unit',
@@ -254,7 +254,7 @@ exports.Prisma.InquiryItemOrderByRelevanceFieldEnum = {
   supplierId: 'supplierId',
   itemId: 'itemId',
   name: 'name',
-  brand: 'brand',
+  detail: 'detail',
   status: 'status',
   unit: 'unit',
   notes: 'notes'
@@ -288,9 +288,9 @@ exports.InquiryCategory = exports.$Enums.InquiryCategory = {
 
 exports.InquiryStatus = exports.$Enums.InquiryStatus = {
   PENDING: 'PENDING',
-  QUOTED: 'QUOTED',
-  ORDERED: 'ORDERED',
-  DELIVERED: 'DELIVERED'
+  INCOMPLETE: 'INCOMPLETE',
+  READY: 'READY',
+  QUOTED: 'QUOTED'
 };
 
 exports.Prisma.ModelName = {

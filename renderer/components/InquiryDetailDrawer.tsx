@@ -65,10 +65,6 @@ const InquiryDetailDrawer = ({ open, onClose, inquiry, handleCreateQuotation }) 
       enterSelectMode();
       return;
     }
-    // In select mode, confirm and create quotation with selected items and edited qty
-    console.log('Confirm Buat Quotation clicked!');
-    console.log('Inquiry to convert:', inquiry);
-    console.log('Selected item indexes:', Array.from(selectedIndexes));
     
     if (handleCreateQuotation && typeof handleCreateQuotation === 'function') {
       const filteredItems = (inquiry.items || [])
@@ -98,7 +94,7 @@ const InquiryDetailDrawer = ({ open, onClose, inquiry, handleCreateQuotation }) 
         <Typography variant="h5" gutterBottom>Detail Inquiry</Typography>
         <Divider sx={{ mb: 2 }} />
         <Typography><b>No Permintaan:</b> {inquiry.requestNumber}</Typography>
-        <Typography><b>Tanggal:</b> {new Date(inquiry.requestDate).toLocaleDateString()}</Typography>
+        <Typography><b>Tanggal:</b> {inquiry.requestDate ? new Date(inquiry.requestDate).toLocaleDateString() : '-'}</Typography>
         <Typography><b>Kategori:</b> {inquiry.category}</Typography>
         <Typography><b>Customer:</b> {inquiry.customer?.name || inquiry.customerId}</Typography>
         <Typography><b>Status:</b> {inquiry.status}</Typography>
@@ -118,15 +114,13 @@ const InquiryDetailDrawer = ({ open, onClose, inquiry, handleCreateQuotation }) 
                 </TableCell>
               )}
               <TableCell>Nama</TableCell>
-              <TableCell>Brand</TableCell>
+              <TableCell>Supplier</TableCell>
+              <TableCell>Detail</TableCell>
               <TableCell>Qty</TableCell>
               <TableCell>Satuan</TableCell>
               <TableCell>HPP/Satuan</TableCell>
               <TableCell>TOTAL HPP</TableCell>
-              <TableCell>Markup %</TableCell>
-              <TableCell>Harga Jual</TableCell>
-              <TableCell>Total</TableCell>
-              <TableCell>Supplier</TableCell>
+              <TableCell>Status</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -141,7 +135,8 @@ const InquiryDetailDrawer = ({ open, onClose, inquiry, handleCreateQuotation }) 
                   </TableCell>
                 )}
                 <TableCell>{item.name}</TableCell>
-                <TableCell>{item.brand}</TableCell>
+                <TableCell>{item.supplierName || (item.supplier?.name) || '-'}</TableCell>
+                <TableCell>{item.detail}</TableCell>
                 <TableCell>
                   {selectMode ? (
                     <TextField
@@ -167,25 +162,11 @@ const InquiryDetailDrawer = ({ open, onClose, inquiry, handleCreateQuotation }) 
                     ? ((Number(qtyByIndex[idx] ?? item.qty) || 0) * (Number(item.hpp) || 0))
                     : (item.totalHpp || (item.qty * item.hpp))}
                 </TableCell>
-                <TableCell>{item.markupPercent}%</TableCell>
-                <TableCell>{item.sellingPrice}</TableCell>
-                <TableCell>
-                  {selectMode
-                    ? ((Number(qtyByIndex[idx] ?? item.qty) || 0) * (Number(item.sellingPrice) || 0))
-                    : item.totalPrice}
-                </TableCell>
-                <TableCell>{item.supplierName || (item.supplier?.name) || '-'}</TableCell>
+                <TableCell>{item.status || '-'}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        
-        {/* Debug info */}
-        <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
-          <Typography variant="body2" color="textSecondary">
-            Debug: Status inquiry = {inquiry.status}, handleCreateQuotation = {typeof handleCreateQuotation}
-          </Typography>
-        </Box>
         
         {inquiry.status !== 'QUOTED' && !selectMode && (
           <Button 

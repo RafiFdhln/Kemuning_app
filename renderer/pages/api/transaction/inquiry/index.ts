@@ -1,6 +1,24 @@
 import prisma from "../../../../../lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 
+// Function to calculate inquiry status based on item readiness
+function calculateInquiryStatus(items: any[]): "PENDING" | "INCOMPLETE" | "READY" {
+  if (!items || items.length === 0) {
+    return "PENDING";
+  }
+
+  const readyItems = items.filter(item => item.status === "READY").length;
+  const totalItems = items.length;
+
+  if (readyItems === 0) {
+    return "PENDING";
+  } else if (readyItems < totalItems) {
+    return "INCOMPLETE";
+  } else {
+    return "READY";
+  }
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     try {
@@ -101,11 +119,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         supplierName: i.supplierName
       })));
 
+      // Calculate status based on item readiness
+      const calculatedStatus = calculateInquiryStatus(filteredItems);
+
       console.log('Creating inquiry with data:', {
         requestNumber: finalRequestNumber,
         requestDate: jsDate,
         customerId,
-        status: status || "PENDING",
+        calculatedStatus,
         remarks,
         category: category || "BARANG",
         itemsCount: filteredItems.length
@@ -116,27 +137,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           requestNumber: finalRequestNumber,
           requestDate: jsDate,
           customerId,
-          status: status || "PENDING",
+          status: calculatedStatus,
           remarks,
           category: category || "BARANG",
           items: filteredItems?.length
             ? {
                 create: filteredItems.map((i: any) => ({
-                  supplierId: i.supplierId || null,
-                  itemId: i.itemId || null,
+                  supplier: i.supplierId ? { connect: { id: i.supplierId } } : undefined,
+                  item: i.itemId ? { connect: { id: i.itemId } } : undefined,
                   name: i.name,
-                  brand: i.brand,
+                  detail: i.detail || null,
                   status: i.status,
                   qty: i.qty,
                   unit: i.unit,
                   hpp: i.hpp ? parseFloat(i.hpp) : 0,
                   totalHpp: i.totalHpp ? parseFloat(i.totalHpp) : (i.hpp && i.qty ? parseFloat(i.hpp) * i.qty : 0),
-                  markupPercent: i.markupPercent ? parseFloat(i.markupPercent) : null,
-                  priceAfterUp: i.priceAfterUp ? parseFloat(i.priceAfterUp) : null,
-                  sellingPrice: i.sellingPrice ? parseFloat(i.sellingPrice) : null,
-                  totalPrice: i.totalPrice ? parseFloat(i.totalPrice) : null,
-                  poPrice: i.poPrice ? parseFloat(i.poPrice) : null,
-                  notes: i.notes,
+                  notes: i.status,
                   deliveryTime: i.deliveryTime ? new Date(i.deliveryTime) : null,
                 })),
               }
@@ -157,6 +173,68 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   }
 
-  res.setHeader("Allow", ["GET", "POST"]);
+  if (req.method === "PUT") {
+    try {
+      const { inquiryId, items } = req.body;
+      
+      if (!inquiryId || !items) {
+        return res.status(400).json({ success: false, message: "inquiryId and items are required" });
+      }
+
+      // Update inquiry items
+      await prisma.inquiryItem.deleteMany({
+        where: { inquiryId }
+      });
+
+      await prisma.inquiryItem.createMany({
+        data: items.map((item: any) => ({
+          inquiryId,
+          supplierId: item.supplierId || null,
+          itemId: item.itemId || null,
+          name: item.name,
+          detail: item.detail || null,
+          status: item.status,
+          qty: item.qty,
+          unit: item.unit,
+          hpp: item.hpp ? parseFloat(item.hpp) : 0,
+          totalHpp: item.totalHpp ? parseFloat(item.totalHpp) : (item.hpp && item.qty ? parseFloat(item.hpp) * item.qty : 0),
+          notes: item.status,
+          deliveryTime: item.deliveryTime ? new Date(item.deliveryTime) : null,
+        }))
+      });
+
+      // Get updated inquiry with items to calculate new status
+      const updatedInquiry = await prisma.inquiry.findUnique({
+        where: { id: inquiryId },
+        include: { items: true }
+      });
+
+      if (!updatedInquiry) {
+        return res.status(404).json({ success: false, message: "Inquiry not found" });
+      }
+
+      // Calculate new status based on updated items
+      const newStatus = calculateInquiryStatus(updatedInquiry.items);
+
+      // Update inquiry status
+      const finalInquiry = await prisma.inquiry.update({
+        where: { id: inquiryId },
+        data: { status: newStatus },
+        include: { customer: true, items: { include: { supplier: true, item: true } } }
+      });
+
+      return res.status(200).json({ 
+        success: true, 
+        data: finalInquiry, 
+        message: "Inquiry updated successfully" 
+      });
+
+    } catch (error: any) {
+      console.error('Error updating inquiry:', error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  }
+
+  res.setHeader("Allow", ["GET", "POST", "PUT"]);
   return res.status(405).end(`Method ${req.method} Not Allowed`);
 }

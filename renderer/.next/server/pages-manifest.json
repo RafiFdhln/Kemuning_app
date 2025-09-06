@@ -4,9 +4,5 @@
   "/_document": "pages/_document.js",
   "/": "pages/index.js",
   "/transaction/inquiry/InquiryPage": "pages/transaction/inquiry/InquiryPage.js",
-  "/transaction/quotation/QuotationPage": "pages/transaction/quotation/QuotationPage.js",
-  "/api/transaction/inquiry": "pages/api/transaction/inquiry.js",
-  "/api/transaction/quotation": "pages/api/transaction/quotation.js",
-  "/api/company/supplier": "pages/api/company/supplier.js",
-  "/api/company/customer": "pages/api/company/customer.js"
+  "/api/transaction/inquiry": "pages/api/transaction/inquiry.js"
 }

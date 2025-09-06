@@ -1,1 +1,20 @@
-{}
+{
+  "src\\components\\dashboard\\MonthlyEarnings.tsx -> react-apexcharts": {
+    "id": "src\\components\\dashboard\\MonthlyEarnings.tsx -> react-apexcharts",
+    "files": [
+      "static/chunks/node_modules_react-apexcharts_dist_react-apexcharts_min_js.js"
+    ]
+  },
+  "src\\components\\dashboard\\SalesOverview.tsx -> react-apexcharts": {
+    "id": "src\\components\\dashboard\\SalesOverview.tsx -> react-apexcharts",
+    "files": [
+      "static/chunks/node_modules_react-apexcharts_dist_react-apexcharts_min_js.js"
+    ]
+  },
+  "src\\components\\dashboard\\YearlyBreakup.tsx -> react-apexcharts": {
+    "id": "src\\components\\dashboard\\YearlyBreakup.tsx -> react-apexcharts",
+    "files": [
+      "static/chunks/node_modules_react-apexcharts_dist_react-apexcharts_min_js.js"
+    ]
+  }
+}

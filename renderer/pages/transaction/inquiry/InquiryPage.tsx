@@ -19,7 +19,7 @@ interface Inquiry {
   category: "BARANG" | "PROJECT";
   customer: Customer;
   remarks: string;
-  status: "PENDING" | "QUOTED" | "ORDERED" | "DELIVERED";
+  status: "PENDING" | "INCOMPLETE" | "READY" | "QUOTED";
   items: InquiryItem[];
 }
 
@@ -30,18 +30,12 @@ interface Customer {
 
 interface InquiryItem {
   name: string;
-  brand?: string;
+  detail?: string;
   status?: string;
   qty: number;
   unit?: string;
   hpp?: number;
   totalHpp?: number;
-  markupPercent?: number;
-  priceAfterUp?: number;
-  sellingPrice?: number;
-  totalPrice?: number;
-  poPrice?: number;
-  notes?: string;
   deliveryTime?: string;
   supplierId?: string;
   supplierName?: string;
@@ -54,7 +48,7 @@ interface FormData {
   category: "BARANG" | "PROJECT";
   customerId: string;
   remarks: string;
-  status: "PENDING" | "QUOTED" | "ORDERED" | "DELIVERED";
+  status: "PENDING" | "INCOMPLETE" | "READY" | "QUOTED";
   items: InquiryItem[];
 }
 
@@ -93,7 +87,13 @@ const useInquiryData = () => {
     ));
   };
 
-  return { data, loading, fetchInquiries, addInquiry, updateInquiryStatus };
+  const updateInquiry = (inquiry: Inquiry) => {
+    setData(prev => prev.map(d => 
+      d.id === inquiry.id ? inquiry : d
+    ));
+  };
+
+  return { data, loading, fetchInquiries, addInquiry, updateInquiryStatus, updateInquiry };
 };
 
 const useCustomerData = () => {
@@ -229,7 +229,7 @@ const InquiryPage = () => {
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
 
   // Custom hooks
-  const { data, loading, fetchInquiries, addInquiry, updateInquiryStatus } = useInquiryData();
+  const { data, loading, fetchInquiries, addInquiry, updateInquiryStatus, updateInquiry } = useInquiryData();
   const { customers, fetchCustomers } = useCustomerData();
   const { suppliers, fetchSuppliers } = useSupplierData();
   const { formData, setFormData, resetFormData, updateFormData, updateOptionData, formatDateTimeLocal } = useFormData();
@@ -266,10 +266,14 @@ const InquiryPage = () => {
       
       const payload = { ...formData, requestDate: formData.requestDate };
       
-      const res = await fetch("/api/transaction/inquiry", {
-        method: "POST",
+      const isEdit = !!formData.id;
+      const url = "/api/transaction/inquiry";
+      const method = isEdit ? "PUT" : "POST";
+      
+      const res = await fetch(url, {
+        method: method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(isEdit ? { inquiryId: formData.id, items: formData.items } : payload),
       });
       
       if (!res.ok) {
@@ -292,7 +296,12 @@ const InquiryPage = () => {
           items: result.data.items || []
         };
         
-        addInquiry(normalizedInquiry);
+        if (isEdit) {
+          // Update existing inquiry in the list
+          updateInquiry(normalizedInquiry);
+        } else {
+          addInquiry(normalizedInquiry);
+        }
         setAlertOpen(true);
         toggleDrawer(false)();
       }
@@ -321,7 +330,7 @@ const InquiryPage = () => {
       const result = await res.json();
       if (!result.success) throw new Error(result.message || 'Gagal membuat quotation');
       
-      updateInquiryStatus(inquiry.requestNumber, "QUOTED");
+      updateInquiryStatus(inquiry.requestNumber, "DITAWARKAN");
       setAlertOpen(true);
       setDetailOpen(false);
     } catch (error: any) {
@@ -357,7 +366,7 @@ const InquiryPage = () => {
       accessorKey: "requestDate", 
       header: "Tanggal", 
       Cell: ({ cell }) => {
-        const value = cell.getValue<Date>();
+        const value = cell.getValue<Date | string>();
         return value ? new Date(value).toLocaleDateString() : '-';
       },
       enableColumnFilter: true,
@@ -391,16 +400,52 @@ const InquiryPage = () => {
       header: "Aksi",
       id: "aksi",
       Cell: ({ row }) => (
-        <Button 
-          size="small" 
-          variant="outlined" 
-          onClick={() => {
-            setSelectedInquiry(row.original);
-            setDetailOpen(true);
-          }}
-        >
-          Detail
-        </Button>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button 
+            size="small" 
+            variant="outlined" 
+            onClick={() => {
+              setSelectedInquiry(row.original);
+              setDetailOpen(true);
+            }}
+          >
+            Detail
+          </Button>
+          {row.original.status !== 'QUOTED' && (
+            <Button 
+              size="small" 
+              variant="contained" 
+              color="primary"
+              onClick={() => {
+                setSelectedInquiry(row.original);
+                setFormData({
+                  ...formData,
+                  id: row.original.id,
+                  requestNumber: row.original.requestNumber,
+                  requestDate: formatDateTimeLocal(new Date(row.original.requestDate)),
+                  category: row.original.category,
+                  customerId: row.original.customer?.id || '',
+                  remarks: row.original.remarks,
+                  items: row.original.items?.map((item: any) => ({
+                    name: item.name,
+                    detail: item.detail,
+                    status: item.status,
+                    qty: item.qty,
+                    unit: item.unit,
+                    hpp: item.hpp,
+                    totalHpp: item.totalHpp,
+                    supplierId: item.supplierId,
+                    supplierName: item.supplier?.name || item.supplierName,
+                    deliveryTime: item.deliveryTime ? formatDateTimeLocal(new Date(item.deliveryTime)) : ''
+                  })) || []
+                });
+                setOpen(true);
+              }}
+            >
+              Edit
+            </Button>
+          )}
+        </Box>
       ),
     },
   ], []);
@@ -416,7 +461,6 @@ const InquiryPage = () => {
       options: customers.map((c) => ({ label: c.name, value: c.id })),
     },
     { name: "remarks", label: "Keterangan", type: "textarea" },
-    { name: "status", label: "Status", type: "autocomplete", options: ["PENDING", "QUOTED", "ORDERED", "DELIVERED"] },
     { name: "items", label: "Items", type: "items" },
   ];
 
@@ -481,7 +525,7 @@ const InquiryPage = () => {
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
         <Alert variant="filled" severity="success" sx={{ color: baselightTheme.palette.success.contrastText, width: "100%" }}>
-          Inquiry berhasil disimpan!
+          {formData.id ? 'Inquiry berhasil diperbarui!' : 'Inquiry berhasil disimpan!'}
         </Alert>
       </Snackbar>
 

@@ -63,9 +63,9 @@ export type ItemType = (typeof ItemType)[keyof typeof ItemType]
 
 export const InquiryStatus: {
   PENDING: 'PENDING',
-  QUOTED: 'QUOTED',
-  ORDERED: 'ORDERED',
-  DELIVERED: 'DELIVERED'
+  INCOMPLETE: 'INCOMPLETE',
+  READY: 'READY',
+  QUOTED: 'QUOTED'
 };
 
 export type InquiryStatus = (typeof InquiryStatus)[keyof typeof InquiryStatus]
@@ -5671,7 +5671,7 @@ export namespace Prisma {
     supplierId: string | null
     itemId: string | null
     name: string | null
-    brand: string | null
+    detail: string | null
     status: string | null
     qty: number | null
     unit: string | null
@@ -5692,7 +5692,7 @@ export namespace Prisma {
     supplierId: string | null
     itemId: string | null
     name: string | null
-    brand: string | null
+    detail: string | null
     status: string | null
     qty: number | null
     unit: string | null
@@ -5713,7 +5713,7 @@ export namespace Prisma {
     supplierId: number
     itemId: number
     name: number
-    brand: number
+    detail: number
     status: number
     qty: number
     unit: number
@@ -5758,7 +5758,7 @@ export namespace Prisma {
     supplierId?: true
     itemId?: true
     name?: true
-    brand?: true
+    detail?: true
     status?: true
     qty?: true
     unit?: true
@@ -5779,7 +5779,7 @@ export namespace Prisma {
     supplierId?: true
     itemId?: true
     name?: true
-    brand?: true
+    detail?: true
     status?: true
     qty?: true
     unit?: true
@@ -5800,7 +5800,7 @@ export namespace Prisma {
     supplierId?: true
     itemId?: true
     name?: true
-    brand?: true
+    detail?: true
     status?: true
     qty?: true
     unit?: true
@@ -5908,7 +5908,7 @@ export namespace Prisma {
     supplierId: string | null
     itemId: string | null
     name: string
-    brand: string | null
+    detail: string | null
     status: string | null
     qty: number
     unit: string | null
@@ -5948,7 +5948,7 @@ export namespace Prisma {
     supplierId?: boolean
     itemId?: boolean
     name?: boolean
-    brand?: boolean
+    detail?: boolean
     status?: boolean
     qty?: boolean
     unit?: boolean
@@ -5976,7 +5976,7 @@ export namespace Prisma {
     supplierId?: boolean
     itemId?: boolean
     name?: boolean
-    brand?: boolean
+    detail?: boolean
     status?: boolean
     qty?: boolean
     unit?: boolean
@@ -5991,7 +5991,7 @@ export namespace Prisma {
     deliveryTime?: boolean
   }
 
-  export type InquiryItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "inquiryId" | "supplierId" | "itemId" | "name" | "brand" | "status" | "qty" | "unit" | "hpp" | "totalHpp" | "markupPercent" | "priceAfterUp" | "sellingPrice" | "totalPrice" | "poPrice" | "notes" | "deliveryTime", ExtArgs["result"]["inquiryItem"]>
+  export type InquiryItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "inquiryId" | "supplierId" | "itemId" | "name" | "detail" | "status" | "qty" | "unit" | "hpp" | "totalHpp" | "markupPercent" | "priceAfterUp" | "sellingPrice" | "totalPrice" | "poPrice" | "notes" | "deliveryTime", ExtArgs["result"]["inquiryItem"]>
   export type InquiryItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     inquiry?: boolean | InquiryDefaultArgs<ExtArgs>
     supplier?: boolean | InquiryItem$supplierArgs<ExtArgs>
@@ -6014,7 +6014,7 @@ export namespace Prisma {
       supplierId: string | null
       itemId: string | null
       name: string
-      brand: string | null
+      detail: string | null
       status: string | null
       qty: number
       unit: string | null
@@ -6405,7 +6405,7 @@ export namespace Prisma {
     readonly supplierId: FieldRef<"InquiryItem", 'String'>
     readonly itemId: FieldRef<"InquiryItem", 'String'>
     readonly name: FieldRef<"InquiryItem", 'String'>
-    readonly brand: FieldRef<"InquiryItem", 'String'>
+    readonly detail: FieldRef<"InquiryItem", 'String'>
     readonly status: FieldRef<"InquiryItem", 'String'>
     readonly qty: FieldRef<"InquiryItem", 'Int'>
     readonly unit: FieldRef<"InquiryItem", 'String'>
@@ -8937,7 +8937,7 @@ export namespace Prisma {
     supplierId: 'supplierId',
     itemId: 'itemId',
     name: 'name',
-    brand: 'brand',
+    detail: 'detail',
     status: 'status',
     qty: 'qty',
     unit: 'unit',
@@ -9051,7 +9051,7 @@ export namespace Prisma {
     supplierId: 'supplierId',
     itemId: 'itemId',
     name: 'name',
-    brand: 'brand',
+    detail: 'detail',
     status: 'status',
     unit: 'unit',
     notes: 'notes'
@@ -9436,7 +9436,7 @@ export namespace Prisma {
     supplierId?: StringNullableFilter<"InquiryItem"> | string | null
     itemId?: StringNullableFilter<"InquiryItem"> | string | null
     name?: StringFilter<"InquiryItem"> | string
-    brand?: StringNullableFilter<"InquiryItem"> | string | null
+    detail?: StringNullableFilter<"InquiryItem"> | string | null
     status?: StringNullableFilter<"InquiryItem"> | string | null
     qty?: IntFilter<"InquiryItem"> | number
     unit?: StringNullableFilter<"InquiryItem"> | string | null
@@ -9461,7 +9461,7 @@ export namespace Prisma {
     supplierId?: SortOrderInput | SortOrder
     itemId?: SortOrderInput | SortOrder
     name?: SortOrder
-    brand?: SortOrderInput | SortOrder
+    detail?: SortOrderInput | SortOrder
     status?: SortOrderInput | SortOrder
     qty?: SortOrder
     unit?: SortOrderInput | SortOrder
@@ -9490,7 +9490,7 @@ export namespace Prisma {
     supplierId?: StringNullableFilter<"InquiryItem"> | string | null
     itemId?: StringNullableFilter<"InquiryItem"> | string | null
     name?: StringFilter<"InquiryItem"> | string
-    brand?: StringNullableFilter<"InquiryItem"> | string | null
+    detail?: StringNullableFilter<"InquiryItem"> | string | null
     status?: StringNullableFilter<"InquiryItem"> | string | null
     qty?: IntFilter<"InquiryItem"> | number
     unit?: StringNullableFilter<"InquiryItem"> | string | null
@@ -9515,7 +9515,7 @@ export namespace Prisma {
     supplierId?: SortOrderInput | SortOrder
     itemId?: SortOrderInput | SortOrder
     name?: SortOrder
-    brand?: SortOrderInput | SortOrder
+    detail?: SortOrderInput | SortOrder
     status?: SortOrderInput | SortOrder
     qty?: SortOrder
     unit?: SortOrderInput | SortOrder
@@ -9544,7 +9544,7 @@ export namespace Prisma {
     supplierId?: StringNullableWithAggregatesFilter<"InquiryItem"> | string | null
     itemId?: StringNullableWithAggregatesFilter<"InquiryItem"> | string | null
     name?: StringWithAggregatesFilter<"InquiryItem"> | string
-    brand?: StringNullableWithAggregatesFilter<"InquiryItem"> | string | null
+    detail?: StringNullableWithAggregatesFilter<"InquiryItem"> | string | null
     status?: StringNullableWithAggregatesFilter<"InquiryItem"> | string | null
     qty?: IntWithAggregatesFilter<"InquiryItem"> | number
     unit?: StringNullableWithAggregatesFilter<"InquiryItem"> | string | null
@@ -10025,7 +10025,7 @@ export namespace Prisma {
   export type InquiryItemCreateInput = {
     id?: string
     name: string
-    brand?: string | null
+    detail?: string | null
     status?: string | null
     qty?: number
     unit?: string | null
@@ -10050,7 +10050,7 @@ export namespace Prisma {
     supplierId?: string | null
     itemId?: string | null
     name: string
-    brand?: string | null
+    detail?: string | null
     status?: string | null
     qty?: number
     unit?: string | null
@@ -10069,7 +10069,7 @@ export namespace Prisma {
   export type InquiryItemUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    detail?: NullableStringFieldUpdateOperationsInput | string | null
     status?: NullableStringFieldUpdateOperationsInput | string | null
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10094,7 +10094,7 @@ export namespace Prisma {
     supplierId?: NullableStringFieldUpdateOperationsInput | string | null
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
-    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    detail?: NullableStringFieldUpdateOperationsInput | string | null
     status?: NullableStringFieldUpdateOperationsInput | string | null
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10116,7 +10116,7 @@ export namespace Prisma {
     supplierId?: string | null
     itemId?: string | null
     name: string
-    brand?: string | null
+    detail?: string | null
     status?: string | null
     qty?: number
     unit?: string | null
@@ -10134,7 +10134,7 @@ export namespace Prisma {
   export type InquiryItemUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    detail?: NullableStringFieldUpdateOperationsInput | string | null
     status?: NullableStringFieldUpdateOperationsInput | string | null
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10155,7 +10155,7 @@ export namespace Prisma {
     supplierId?: NullableStringFieldUpdateOperationsInput | string | null
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
-    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    detail?: NullableStringFieldUpdateOperationsInput | string | null
     status?: NullableStringFieldUpdateOperationsInput | string | null
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10747,7 +10747,7 @@ export namespace Prisma {
     supplierId?: SortOrder
     itemId?: SortOrder
     name?: SortOrder
-    brand?: SortOrder
+    detail?: SortOrder
     status?: SortOrder
     qty?: SortOrder
     unit?: SortOrder
@@ -10779,7 +10779,7 @@ export namespace Prisma {
     supplierId?: SortOrder
     itemId?: SortOrder
     name?: SortOrder
-    brand?: SortOrder
+    detail?: SortOrder
     status?: SortOrder
     qty?: SortOrder
     unit?: SortOrder
@@ -10800,7 +10800,7 @@ export namespace Prisma {
     supplierId?: SortOrder
     itemId?: SortOrder
     name?: SortOrder
-    brand?: SortOrder
+    detail?: SortOrder
     status?: SortOrder
     qty?: SortOrder
     unit?: SortOrder
@@ -11700,7 +11700,7 @@ export namespace Prisma {
   export type InquiryItemCreateWithoutItemInput = {
     id?: string
     name: string
-    brand?: string | null
+    detail?: string | null
     status?: string | null
     qty?: number
     unit?: string | null
@@ -11723,7 +11723,7 @@ export namespace Prisma {
     inquiryId: string
     supplierId?: string | null
     name: string
-    brand?: string | null
+    detail?: string | null
     status?: string | null
     qty?: number
     unit?: string | null
@@ -11774,7 +11774,7 @@ export namespace Prisma {
     supplierId?: StringNullableFilter<"InquiryItem"> | string | null
     itemId?: StringNullableFilter<"InquiryItem"> | string | null
     name?: StringFilter<"InquiryItem"> | string
-    brand?: StringNullableFilter<"InquiryItem"> | string | null
+    detail?: StringNullableFilter<"InquiryItem"> | string | null
     status?: StringNullableFilter<"InquiryItem"> | string | null
     qty?: IntFilter<"InquiryItem"> | number
     unit?: StringNullableFilter<"InquiryItem"> | string | null
@@ -11921,7 +11921,7 @@ export namespace Prisma {
   export type InquiryItemCreateWithoutSupplierInput = {
     id?: string
     name: string
-    brand?: string | null
+    detail?: string | null
     status?: string | null
     qty?: number
     unit?: string | null
@@ -11944,7 +11944,7 @@ export namespace Prisma {
     inquiryId: string
     itemId?: string | null
     name: string
-    brand?: string | null
+    detail?: string | null
     status?: string | null
     qty?: number
     unit?: string | null
@@ -12014,7 +12014,7 @@ export namespace Prisma {
   export type InquiryItemCreateWithoutInquiryInput = {
     id?: string
     name: string
-    brand?: string | null
+    detail?: string | null
     status?: string | null
     qty?: number
     unit?: string | null
@@ -12037,7 +12037,7 @@ export namespace Prisma {
     supplierId?: string | null
     itemId?: string | null
     name: string
-    brand?: string | null
+    detail?: string | null
     status?: string | null
     qty?: number
     unit?: string | null
@@ -12598,7 +12598,7 @@ export namespace Prisma {
   export type InquiryItemCreateWithoutQuotationItemsInput = {
     id?: string
     name: string
-    brand?: string | null
+    detail?: string | null
     status?: string | null
     qty?: number
     unit?: string | null
@@ -12622,7 +12622,7 @@ export namespace Prisma {
     supplierId?: string | null
     itemId?: string | null
     name: string
-    brand?: string | null
+    detail?: string | null
     status?: string | null
     qty?: number
     unit?: string | null
@@ -12689,7 +12689,7 @@ export namespace Prisma {
   export type InquiryItemUpdateWithoutQuotationItemsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    detail?: NullableStringFieldUpdateOperationsInput | string | null
     status?: NullableStringFieldUpdateOperationsInput | string | null
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12713,7 +12713,7 @@ export namespace Prisma {
     supplierId?: NullableStringFieldUpdateOperationsInput | string | null
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
-    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    detail?: NullableStringFieldUpdateOperationsInput | string | null
     status?: NullableStringFieldUpdateOperationsInput | string | null
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12733,7 +12733,7 @@ export namespace Prisma {
     inquiryId: string
     supplierId?: string | null
     name: string
-    brand?: string | null
+    detail?: string | null
     status?: string | null
     qty?: number
     unit?: string | null
@@ -12751,7 +12751,7 @@ export namespace Prisma {
   export type InquiryItemUpdateWithoutItemInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    detail?: NullableStringFieldUpdateOperationsInput | string | null
     status?: NullableStringFieldUpdateOperationsInput | string | null
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12774,7 +12774,7 @@ export namespace Prisma {
     inquiryId?: StringFieldUpdateOperationsInput | string
     supplierId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
-    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    detail?: NullableStringFieldUpdateOperationsInput | string | null
     status?: NullableStringFieldUpdateOperationsInput | string | null
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12795,7 +12795,7 @@ export namespace Prisma {
     inquiryId?: StringFieldUpdateOperationsInput | string
     supplierId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
-    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    detail?: NullableStringFieldUpdateOperationsInput | string | null
     status?: NullableStringFieldUpdateOperationsInput | string | null
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12905,7 +12905,7 @@ export namespace Prisma {
     inquiryId: string
     itemId?: string | null
     name: string
-    brand?: string | null
+    detail?: string | null
     status?: string | null
     qty?: number
     unit?: string | null
@@ -12923,7 +12923,7 @@ export namespace Prisma {
   export type InquiryItemUpdateWithoutSupplierInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    detail?: NullableStringFieldUpdateOperationsInput | string | null
     status?: NullableStringFieldUpdateOperationsInput | string | null
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12946,7 +12946,7 @@ export namespace Prisma {
     inquiryId?: StringFieldUpdateOperationsInput | string
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
-    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    detail?: NullableStringFieldUpdateOperationsInput | string | null
     status?: NullableStringFieldUpdateOperationsInput | string | null
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12967,7 +12967,7 @@ export namespace Prisma {
     inquiryId?: StringFieldUpdateOperationsInput | string
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
-    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    detail?: NullableStringFieldUpdateOperationsInput | string | null
     status?: NullableStringFieldUpdateOperationsInput | string | null
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12987,7 +12987,7 @@ export namespace Prisma {
     supplierId?: string | null
     itemId?: string | null
     name: string
-    brand?: string | null
+    detail?: string | null
     status?: string | null
     qty?: number
     unit?: string | null
@@ -13015,7 +13015,7 @@ export namespace Prisma {
   export type InquiryItemUpdateWithoutInquiryInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    detail?: NullableStringFieldUpdateOperationsInput | string | null
     status?: NullableStringFieldUpdateOperationsInput | string | null
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
@@ -13038,7 +13038,7 @@ export namespace Prisma {
     supplierId?: NullableStringFieldUpdateOperationsInput | string | null
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
-    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    detail?: NullableStringFieldUpdateOperationsInput | string | null
     status?: NullableStringFieldUpdateOperationsInput | string | null
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
@@ -13059,7 +13059,7 @@ export namespace Prisma {
     supplierId?: NullableStringFieldUpdateOperationsInput | string | null
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
-    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    detail?: NullableStringFieldUpdateOperationsInput | string | null
     status?: NullableStringFieldUpdateOperationsInput | string | null
     qty?: IntFieldUpdateOperationsInput | number
     unit?: NullableStringFieldUpdateOperationsInput | string | null
