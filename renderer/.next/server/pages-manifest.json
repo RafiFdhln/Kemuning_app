@@ -2,7 +2,9 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/": "pages/index.js",
   "/transaction/inquiry/InquiryPage": "pages/transaction/inquiry/InquiryPage.js",
-  "/api/transaction/inquiry": "pages/api/transaction/inquiry.js"
+  "/": "pages/index.js",
+  "/api/company/supplier": "pages/api/company/supplier.js",
+  "/api/transaction/inquiry": "pages/api/transaction/inquiry.js",
+  "/api/company/customer": "pages/api/company/customer.js"
 }

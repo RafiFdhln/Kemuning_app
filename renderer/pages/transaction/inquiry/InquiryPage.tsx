@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Snackbar, Typography } from "@mui/material";
+import { Alert, Box, Button, IconButton, Link, Snackbar, Typography } from "@mui/material";
 import FullLayout from "../../../src/layouts/full/FullLayout";
 import DashboardCard from "../../../src/components/shared/DashboardCard";
 import PageContainer from "../../../src/components/container/PageContainer";
@@ -6,7 +6,7 @@ import { baselightTheme } from "../../../src/theme/DefaultColors";
 import DataTable from "../../../components/DataTable";
 import { MRT_ColumnDef } from "material-react-table";
 import { useMemo, useState, useEffect } from "react";
-import { IconCirclePlus } from "@tabler/icons-react";
+import { IconCirclePlus, IconPencil, IconFileDownload } from "@tabler/icons-react";
 import AddNewDataDrawer from "../../../components/AddNewDataDrawer";
 import * as XLSX from "xlsx";
 import InquiryDetailDrawer from "../../../components/InquiryDetailDrawer";
@@ -330,7 +330,7 @@ const InquiryPage = () => {
       const result = await res.json();
       if (!result.success) throw new Error(result.message || 'Gagal membuat quotation');
       
-      updateInquiryStatus(inquiry.requestNumber, "DITAWARKAN");
+      updateInquiryStatus(inquiry.requestNumber, "QUOTED");
       setAlertOpen(true);
       setDetailOpen(false);
     } catch (error: any) {
@@ -351,7 +351,28 @@ const InquiryPage = () => {
     { 
       accessorKey: "requestNumber", 
       header: "No Permintaan",
-      Cell: ({ cell }) => cell.getValue<string>() || '-',
+      Cell: ({ cell, row }) => (
+        <Button
+          variant="text"
+          onClick={() => {
+            setSelectedInquiry(row.original);
+            setDetailOpen(true);
+          }}
+          sx={{
+            textTransform: 'none',
+            color: '#0A8DD0',
+            fontWeight: 500,
+            textAlign: 'left',
+            justifyContent: 'flex-start',
+            '&:hover': {
+              backgroundColor: '#E6F7F9',
+              textDecoration: 'underline'
+            }
+          }}
+        >
+          {cell.getValue<string>() || '-'}
+        </Button>
+      ),
       enableColumnFilter: true,
       enableGlobalFilter: true
     },
@@ -387,12 +408,64 @@ const InquiryPage = () => {
       header: "Keterangan",
       Cell: ({ cell }) => cell.getValue<string>() || '-',
       enableColumnFilter: true,
-      enableGlobalFilter: true
+      enableGlobalFilter: true,
     },
     { 
       accessorKey: "status", 
       header: "Status",
-      Cell: ({ cell }) => cell.getValue<string>() || '-',
+      Cell: ({ cell }) => {
+        const status = cell.getValue<string>();
+        if (!status) return '-';
+        
+        const getStatusStyle = (status: string) => {
+          switch (status) {
+            case 'PENDING':
+              return {
+                border: '2px solid #FF2D2D',
+                backgroundColor: '#FFEAEA',
+                color: '#FF2D2D',
+                fontWeight: 500
+              };
+            case 'INCOMPLETE':
+              return {
+                border: '2px solid #F9A825',
+                backgroundColor: '#FEF6E9',
+                color: '#F9A825',
+                fontWeight: 400
+              };
+            case 'READY':
+              return {
+                border: '2px solid #50B498',
+                backgroundColor: '#ECFFF9',
+                color: '#50B498',
+                fontWeight: 400
+              };
+            default:
+              return {
+                border: '2px solid #9e9e9e',
+                backgroundColor: '#f5f5f5',
+                color: '#9e9e9e',
+                fontWeight: 400
+              };
+          }
+        };
+
+        return (
+          <Box
+            sx={{
+              display: 'inline-block',
+              padding: '4px 12px',
+              borderRadius: '16px',
+              fontSize: '0.875rem',
+              textAlign: 'center',
+              minWidth: '80px',
+              ...getStatusStyle(status)
+            }}
+          >
+            {status}
+          </Box>
+        );
+      },
       enableColumnFilter: true,
       enableGlobalFilter: true
     },
@@ -400,22 +473,20 @@ const InquiryPage = () => {
       header: "Aksi",
       id: "aksi",
       Cell: ({ row }) => (
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button 
-            size="small" 
-            variant="outlined" 
-            onClick={() => {
-              setSelectedInquiry(row.original);
-              setDetailOpen(true);
-            }}
-          >
-            Detail
-          </Button>
+        <Box sx={{ display: 'flex', gap: 1, justifyContent:'start' }}>
           {row.original.status !== 'QUOTED' && (
-            <Button 
-              size="small" 
-              variant="contained" 
-              color="primary"
+            <IconButton
+              size="small"
+              // color="primary"
+              sx={{
+                color: "#0A8DD0",
+                border: "2px solid #0A8DD0", // warna biru border
+                backgroundColor: "#E6F7F9",   // biru muda background
+                borderRadius: "8px",         // biar agak rounded
+                "&:hover": {
+                  backgroundColor: "#bbdefb", // warna saat hover
+                }
+              }}
               onClick={() => {
                 setSelectedInquiry(row.original);
                 setFormData({
@@ -442,9 +513,27 @@ const InquiryPage = () => {
                 setOpen(true);
               }}
             >
-              Edit
-            </Button>
+              <IconPencil fontSize="small" />
+            </IconButton>
           )}
+          <IconButton
+              size="small"
+              // color="primary"
+              sx={{
+                color: "#0A8DD0",
+                border: "2px solid #0A8DD0", // warna biru border
+                backgroundColor: "#E6F7F9",   // biru muda background
+                borderRadius: "8px",         // biar agak rounded
+                "&:hover": {
+                  backgroundColor: "#bbdefb", // warna saat hover
+                }
+              }}
+              onClick={() => {
+                setSelectedInquiry(row.original);
+              }}
+            >
+              <IconFileDownload fontSize="small" />
+            </IconButton>
         </Box>
       ),
     },
@@ -466,34 +555,52 @@ const InquiryPage = () => {
 
   return (
     <PageContainer title="Inquiry">
-      <Box sx={{ mb: 2.5 }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2.5 }}>
-          <Typography variant="h4">Inquiry</Typography>
-          <Box sx={{ display: "flex", gap: 1.5 }}>
-            <Button
-              size="medium"
-              variant="outlined"
-              onClick={() => exportToExcel(data)}
-              sx={{
-                fontWeight: 600,
-                color: baselightTheme.palette.text.primary,
-                borderColor: baselightTheme.palette.grey[400],
-              }}
-            >
-              Export
-            </Button>
-            <Button
-              size="medium"
-              variant="contained"
-              startIcon={<IconCirclePlus size={20} />}
-              onClick={toggleDrawer(true)}
-              sx={{ fontWeight: 500, color: "white" }}
-            >
-              Tambah Inquiry
-            </Button>
-          </Box>
-        </Box>
-      </Box>
+      <Box sx={{ mb: 1 }}>
+              <DashboardCard>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Typography variant="h4">Inquiry</Typography>
+                  <Box sx={{ display: 'flex', gap: 1.5 }}>
+                    <Button
+                      variant="outlined"
+                      onClick={() => exportToExcel(data)}
+                      sx={{
+                        fontWeight: 600,
+                        color: baselightTheme.palette.text.primary,
+                        borderColor: baselightTheme.palette.grey[400],
+                      }}
+                    >
+                      Export
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      component={Link}
+                      href="/company_data/chart_of_account/Import"
+                      sx={{
+                        fontWeight: 600,
+                        color: baselightTheme.palette.text.primary,
+                        borderColor: baselightTheme.palette.grey[400],
+                      }}
+                    >
+                      Import
+                    </Button>
+                    <Button
+                      variant="contained"
+                      startIcon={<IconCirclePlus size={20} />}
+                      onClick={toggleDrawer(true)}
+                      sx={{ fontWeight: 500, color: 'white' }}
+                    >
+                      Tambah Inquiry
+                    </Button>
+                  </Box>
+                </Box>
+              </DashboardCard>
+            </Box>
 
       <DashboardCard>
         <DataTable columns={columns} data={data} pageSize={10} showGlobalFilter={true} />
