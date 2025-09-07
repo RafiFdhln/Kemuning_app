@@ -16,6 +16,7 @@ const InquiryDetailDrawer = ({ open, onClose, inquiry, handleCreateQuotation }) 
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIndexes, setSelectedIndexes] = useState<Set<number>>(new Set());
   const [qtyByIndex, setQtyByIndex] = useState<Record<number, number>>({});
+  const [marginPctByIndex, setMarginPctByIndex] = useState<Record<number, number>>({});
 
   const allItemIndexes: Set<number> = useMemo(() => new Set<number>((inquiry.items?.map((_, idx) => idx) || [])), [inquiry.items]);
   const allSelected = useMemo(() => inquiry.items && inquiry.items.length > 0 && selectedIndexes.size === inquiry.items.length, [selectedIndexes, inquiry.items]);
@@ -31,12 +32,18 @@ const InquiryDetailDrawer = ({ open, onClose, inquiry, handleCreateQuotation }) 
       initialQty[idx] = Number(item.qty) || 0;
     });
     setQtyByIndex(initialQty);
+    const initialMargin: Record<number, number> = {};
+    inquiry.items?.forEach((_, idx) => {
+      initialMargin[idx] = 0; // default 0% margin
+    });
+    setMarginPctByIndex(initialMargin);
   };
 
   const cancelSelectMode = () => {
     setSelectMode(false);
     setSelectedIndexes(new Set<number>());
     setQtyByIndex({});
+    setMarginPctByIndex({});
   };
 
   const toggleSelectAll = () => {
@@ -73,12 +80,15 @@ const InquiryDetailDrawer = ({ open, onClose, inquiry, handleCreateQuotation }) 
         .map(({ item, idx }) => {
           const newQty = Number(qtyByIndex[idx] ?? item.qty) || 0;
           const hpp = Number(item.hpp) || 0;
-          const sellingPrice = Number(item.sellingPrice) || 0;
+          const marginPct = Number(marginPctByIndex[idx] ?? 0) || 0;
+          const sellingPrice = hpp * (1 + marginPct / 100);
           return {
             ...item,
             qty: newQty,
             totalHpp: newQty * hpp,
+            price: sellingPrice,
             totalPrice: newQty * sellingPrice,
+            marginPct,
           };
         });
       const payload = { ...inquiry, items: filteredItems };
@@ -87,6 +97,18 @@ const InquiryDetailDrawer = ({ open, onClose, inquiry, handleCreateQuotation }) 
       console.error('handleCreateQuotation is not a function or not provided');
     }
   };
+
+  const subtotalAfterMargin = useMemo(() => {
+    if (!selectMode) return 0;
+    return (inquiry.items || []).reduce((sum: number, item: any, idx: number) => {
+      if (!selectedIndexes.has(idx)) return sum;
+      const qty = Number(qtyByIndex[idx] ?? item.qty) || 0;
+      const hpp = Number(item.hpp) || 0;
+      const marginPct = Number(marginPctByIndex[idx] ?? 0) || 0;
+      const price = hpp * (1 + marginPct / 100);
+      return sum + qty * price;
+    }, 0);
+  }, [selectMode, inquiry.items, selectedIndexes, qtyByIndex, marginPctByIndex]);
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose} PaperProps={{ sx: { minWidth: 500, p: 3 } }}>
@@ -120,6 +142,12 @@ const InquiryDetailDrawer = ({ open, onClose, inquiry, handleCreateQuotation }) 
               <TableCell>Satuan</TableCell>
               <TableCell>HPP/Satuan</TableCell>
               <TableCell>TOTAL HPP</TableCell>
+              {selectMode && (
+                <>
+                  <TableCell>Margin %</TableCell>
+                  <TableCell>Total Jual</TableCell>
+                </>
+              )}
               <TableCell>Status</TableCell>
             </TableRow>
           </TableHead>
@@ -162,11 +190,43 @@ const InquiryDetailDrawer = ({ open, onClose, inquiry, handleCreateQuotation }) 
                     ? ((Number(qtyByIndex[idx] ?? item.qty) || 0) * (Number(item.hpp) || 0))
                     : (item.totalHpp || (item.qty * item.hpp))}
                 </TableCell>
+                {selectMode && (
+                  <>
+                    <TableCell>
+                      <TextField
+                        type="number"
+                        size="small"
+                        value={marginPctByIndex[idx] ?? 0}
+                        inputProps={{ min: 0 }}
+                        onChange={(e) => {
+                          const val = Number(e.target.value);
+                          setMarginPctByIndex(prev => ({ ...prev, [idx]: val }));
+                        }}
+                        disabled={!selectedIndexes.has(idx)}
+                        sx={{ width: 90 }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {(() => {
+                        const qty = Number(qtyByIndex[idx] ?? item.qty) || 0;
+                        const hpp = Number(item.hpp) || 0;
+                        const marginPct = Number(marginPctByIndex[idx] ?? 0) || 0;
+                        const price = hpp * (1 + marginPct / 100);
+                        return qty * price;
+                      })()}
+                    </TableCell>
+                  </>
+                )}
                 <TableCell>{item.status || '-'}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        {selectMode && (
+          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+            <Typography variant="subtitle1"><b>Total:</b> {subtotalAfterMargin}</Typography>
+          </Box>
+        )}
         
         {inquiry.status !== 'QUOTED' && !selectMode && (
           <Button 

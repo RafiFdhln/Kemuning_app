@@ -318,8 +318,13 @@ const InquiryPage = () => {
         inquiryItemId: item.id || null,
         name: item.name,
         qty: Number(item.qty) || 0,
-        price: Number(item.sellingPrice) || 0,
-        totalPrice: Number(item.totalPrice ?? ((Number(item.qty) || 0) * (Number(item.sellingPrice) || 0))) || 0,
+        // Use margin-adjusted price if provided by the drawer, otherwise fallback to sellingPrice
+        price: Number(item.price ?? item.sellingPrice ?? 0) || 0,
+        totalPrice: Number(
+          item.totalPrice ?? (
+            (Number(item.qty) || 0) * (Number(item.price ?? item.sellingPrice ?? 0) || 0)
+          )
+        ) || 0,
         remarks: item.notes || null,
       }));
       const res = await fetch("/api/transaction/quotation", {
