@@ -8,7 +8,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         include: {
           customer: true,
           inquiry: true,
-          items: true,
+          items: { include: { inquiryItem: true } },
+          purchaseOrders: true,
         },
         orderBy: { createdAt: "desc" },
       });
@@ -29,6 +30,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
       if (!inquiry) {
         return res.status(404).json({ success: false, message: "Inquiry not found" });
+      }
+
+      // Check if all items are ready
+      const allItemsReady = inquiry.items.every(item => item.status === 'READY');
+      if (!allItemsReady) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Semua barang harus dalam status READY sebelum dapat dijadikan quotation" 
+        });
       }
       const now = new Date();
       const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -60,6 +70,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             totalPrice: item.totalPrice || 0,
             remarks: item.notes || null,
           }));
+
+      // Update InquiryItem with markupPercent if provided
+      if (Array.isArray(items) && items.length > 0) {
+        console.log('Items received:', items); // Debug log
+        for (const it of items) {
+          console.log('Processing item:', { inquiryItemId: it.inquiryItemId, marginPct: it.marginPct }); // Debug log
+          if (it.inquiryItemId && it.marginPct !== undefined) {
+            const updatedItem = await prisma.inquiryItem.update({
+              where: { id: it.inquiryItemId },
+              data: { markupPercent: Number(it.marginPct) || 0 }
+            });
+            console.log('Updated InquiryItem:', updatedItem); // Debug log
+          }
+        }
+      }
 
       const quotation = await prisma.quotation.create({
         data: {

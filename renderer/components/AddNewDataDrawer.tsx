@@ -1,7 +1,7 @@
 import React from 'react';
 import { Drawer, Box, Typography, Button, Divider, TextField } from '@mui/material';
 import AutoCompleteInput from './AutoCompleteInput';
-import BasicInput from './BasicInput'; 
+import BasicInput from './BasicInput';
 import { baselightTheme } from '../src/theme/DefaultColors';
 import { IconVocabulary } from '@tabler/icons-react';
 import ItemsTable from './ItemTable'
@@ -16,6 +16,7 @@ const AddNewDataDrawer = ({
   width,
   handleOptionChange,
   suppliers = [], // tambahkan default value
+  title = 'Tambah Data', // tambahkan default title
 }) => {
 
   const handleCloseDrawer = () => {
@@ -29,15 +30,21 @@ const AddNewDataDrawer = ({
           <AutoCompleteInput
             key={field.name}
             label={field.label}
-            options={field.options}
-            value={field.options && Array.isArray(field.options) && field.options[0] && typeof field.options[0] === 'object'
-              ? field.options.find((opt) => opt.value === (formData[field.name] ?? '')) || null
-              : (formData[field.name] ?? '')}
+            options={field.options || []}
+            value={field.name === 'customerId' 
+              ? formData[field.name] 
+                ? field.options?.find(opt => opt.value === formData[field.name]) || ''
+                : ''
+              : formData[field.name] || ''}
             onChange={(event, value) => {
-              if (value && typeof value === 'object' && value.value) {
-                handleOptionChange(field.name, value.value);
+              console.log('AutoComplete onChange:', { field: field.name, value, event });
+              // For customer field, we need to extract the value from the option object
+              if (field.name === 'customerId' && value && typeof value === 'object' && value.value) {
+                handleFormChange(field.name, value.value);
+              } else if (field.name === 'category' && typeof value === 'string') {
+                handleFormChange(field.name, value);
               } else {
-                handleOptionChange(field.name, value || '');
+                handleFormChange(field.name, value);
               }
             }}
           />
@@ -48,8 +55,8 @@ const AddNewDataDrawer = ({
             key={field.name}
             label={field.label}
             value={formData[field.name] || ''} 
-            multiline={field.type === 'textarea'} 
             onChange={(event) => handleFormChange(field.name, event.target.value)}
+            multiline={true}
           />
         );
         case 'basictext':
@@ -58,9 +65,9 @@ const AddNewDataDrawer = ({
             key={field.name}
             label={field.label}
             value={formData[field.name] || ''} 
-            multiline={false} 
             onChange={(event) => handleFormChange(field.name, event.target.value)}
-            readOnly={field.name === 'requestNumber'}
+            multiline={false}
+            disabled={field.name === 'requestNumber'}
           />
         );
         case 'numbertext':
@@ -105,11 +112,13 @@ const AddNewDataDrawer = ({
       open={open}
       PaperProps={{
         sx: {
-          minWidth: {width},
+          // minWidth: {width},
           flex: 1,
           margin: 2,
           maxHeight: '96%',
           minHeight: '96%',
+          maxWidth: '98%',
+          minWidth: '98%',
           borderRadius: '10px',
           boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
         },
@@ -128,7 +137,7 @@ const AddNewDataDrawer = ({
         <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}>
           <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}>
             {/* <IconVocabulary size={28} color={baselightTheme.palette.primary.dark} /> */}
-            <Typography variant="h5" mb={3}>Tambah Inquiry</Typography>
+            <Typography variant="h5" mb={3}>{title}</Typography>
           </Box>
           {formData?.requestNumber ? (
             <Typography variant="subtitle2" sx={{ mb: 3, color: baselightTheme.palette.text.secondary }}>
@@ -144,14 +153,36 @@ const AddNewDataDrawer = ({
             flexDirection: 'column',
             justifyContent: 'start',
             height: '100%',
+            overflow: 'auto',
+            flex: 1,
           }}
         >
           <Divider sx={{ mb: 3 }} />
-          {formFields.map(field => renderFormField(field))}
-
+          
+          {/* Regular form fields in 2 columns */}
+          <Box 
+            sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: '1fr 1fr', 
+              gap: 3, 
+              pb: 2,
+              '@media (max-width: 768px)': {
+                gridTemplateColumns: '1fr',
+              }
+            }}
+          >
+            {formFields.filter(field => field.type !== 'items').map(field => renderFormField(field))}
+          </Box>
+          
+          {/* Items table in full width */}
+          {formFields.filter(field => field.type === 'items').map(field => (
+            <Box key={field.name} sx={{ pb: 2 }}>
+              {renderFormField(field)}
+            </Box>
+          ))}
         </Box>
 
-        <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'end', gap: 3, mt:3, mb:3}}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'end', gap: 3, mb: 2, pt: 2, borderTop: '1px solid #e0e0e0' }}>
           <Button
             sx={{
               fontWeight: 600,

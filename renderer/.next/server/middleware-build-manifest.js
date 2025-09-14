@@ -9,11 +9,6 @@ self.__BUILD_MANIFEST = {
   "lowPriorityFiles": [],
   "rootMainFiles": [],
   "pages": {
-    "/": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/index.js"
-    ],
     "/_app": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
@@ -24,10 +19,20 @@ self.__BUILD_MANIFEST = {
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
+    "/transaction/delivery/DeliveryPage": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/transaction/delivery/DeliveryPage.js"
+    ],
     "/transaction/inquiry/InquiryPage": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
       "static/chunks/pages/transaction/inquiry/InquiryPage.js"
+    ],
+    "/transaction/quotation/QuotationPage": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/transaction/quotation/QuotationPage.js"
     ]
   },
   "ampFirstPages": []

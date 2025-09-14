@@ -21,6 +21,12 @@ const InquiryDetailDrawer = ({ open, onClose, inquiry, handleCreateQuotation }) 
   const allItemIndexes: Set<number> = useMemo(() => new Set<number>((inquiry.items?.map((_, idx) => idx) || [])), [inquiry.items]);
   const allSelected = useMemo(() => inquiry.items && inquiry.items.length > 0 && selectedIndexes.size === inquiry.items.length, [selectedIndexes, inquiry.items]);
   const someSelected = useMemo(() => selectedIndexes.size > 0 && !allSelected, [selectedIndexes, allSelected]);
+  
+  // Check if all items are ready
+  const allItemsReady = useMemo(() => {
+    if (!inquiry.items || inquiry.items.length === 0) return false;
+    return inquiry.items.every(item => item.status === 'READY');
+  }, [inquiry.items]);
 
   const enterSelectMode = () => {
     setSelectMode(true);
@@ -69,6 +75,11 @@ const InquiryDetailDrawer = ({ open, onClose, inquiry, handleCreateQuotation }) 
   const handleQuotationClick = () => {
     // First click enters select mode
     if (!selectMode) {
+      // Check if all items are ready before entering select mode
+      if (!allItemsReady) {
+        alert('Semua barang harus dalam status READY sebelum dapat dijadikan quotation');
+        return;
+      }
       enterSelectMode();
       return;
     }
@@ -234,7 +245,8 @@ const InquiryDetailDrawer = ({ open, onClose, inquiry, handleCreateQuotation }) 
             variant="contained" 
             color="secondary" 
             onClick={handleQuotationClick}
-            disabled={!handleCreateQuotation}
+            disabled={!handleCreateQuotation || !allItemsReady}
+            title={!allItemsReady ? "Semua barang harus dalam status READY" : ""}
           >
             Jadikan Quotation
           </Button>

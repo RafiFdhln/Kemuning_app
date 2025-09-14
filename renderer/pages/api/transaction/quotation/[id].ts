@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         include: {
           customer: true,
           inquiry: true,
-          items: true,
+          items: { include: { inquiryItem: true } },
         },
       });
       if (!quotation) {

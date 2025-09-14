@@ -3,8 +3,12 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/": "pages/index.js",
+  "/api/transaction/quotation": "pages/api/transaction/quotation.js",
+  "/transaction/quotation/QuotationPage": "pages/transaction/quotation/QuotationPage.js",
+  "/api/company/customer": "pages/api/company/customer.js",
   "/transaction/inquiry/InquiryPage": "pages/transaction/inquiry/InquiryPage.js",
   "/api/transaction/inquiry": "pages/api/transaction/inquiry.js",
-  "/api/company/customer": "pages/api/company/customer.js",
-  "/api/company/supplier": "pages/api/company/supplier.js"
+  "/api/company/supplier": "pages/api/company/supplier.js",
+  "/transaction/delivery/DeliveryPage": "pages/transaction/delivery/DeliveryPage.js",
+  "/api/transaction/po": "pages/api/transaction/po.js"
 }

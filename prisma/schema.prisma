@@ -35,13 +35,19 @@ model Customer {
   id        String     @id @default(uuid()) @db.VarChar(36)
   code      String     @unique @db.VarChar(20)
   name      String     @db.VarChar(100)
-  npwp      String?    @unique @db.VarChar(20)
-  address   String?    @db.VarChar(255)
-  remarks   String?    @db.VarChar(255)
+  address1   String?    @db.VarChar(255)
+  address2   String?    @db.VarChar(255)
+  address3   String?    @db.VarChar(255)
+  address4   String?    @db.VarChar(255)
+  address5   String?    @db.VarChar(255)
+  address6   String?    @db.VarChar(255)
+  attnInv   String?    @map("attn_inv") @db.VarChar(100)
+  attnSj    String?    @map("attn_sj") @db.VarChar(100)
 
   // Relasi
-  inquiries   Inquiry[]
-  quotations  Quotation[]
+  inquiries      Inquiry[]
+  quotations     Quotation[]
+  purchaseOrders PurchaseOrder[]
 
   @@map("customers")
 }
@@ -135,6 +141,7 @@ model Quotation {
   inquiry         Inquiry       @relation(fields: [inquiryId], references: [id])
   customer        Customer      @relation(fields: [customerId], references: [id])
   items           QuotationItem[]
+  purchaseOrders  PurchaseOrder[]
 
   @@map("quotations")
 }
@@ -154,4 +161,40 @@ model QuotationItem {
   inquiryItem   InquiryItem? @relation(fields: [inquiryItemId], references: [id])
 
   @@map("quotation_items")
+}
+
+model PurchaseOrder {
+  id              String              @id @default(uuid()) @db.VarChar(36)
+  poNumber        String              @unique @map("po_number") @db.VarChar(50)
+  quotationId     String?             @map("quotation_id") @db.VarChar(36)
+  quotationNumber String?             @map("quotation_number") @db.VarChar(50)
+  customerId      String              @map("customer_id") @db.VarChar(36)
+  customerName    String              @map("customer_name") @db.VarChar(100)
+  status          String              @default("DRAFT")
+  remarks         String?             @db.Text
+  createdAt       DateTime            @default(now()) @map("created_at") @db.DateTime(0)
+  updatedAt       DateTime            @updatedAt @map("updated_at") @db.DateTime(0)
+
+  // Relasi
+  customer        Customer            @relation(fields: [customerId], references: [id])
+  quotation       Quotation?          @relation(fields: [quotationId], references: [id])
+  items           PurchaseOrderItem[]
+
+  @@map("purchase_orders")
+}
+
+model PurchaseOrderItem {
+  id            String        @id @default(uuid()) @db.VarChar(36)
+  purchaseOrderId String      @map("purchase_order_id") @db.VarChar(36)
+  name          String        @db.VarChar(100)
+  qty           Int           @default(1)
+  unit          String?       @db.VarChar(20)
+  poPrice       Decimal?      @map("po_price") @db.Decimal(18, 2)
+  totalPoPrice  Decimal?      @map("total_po_price") @db.Decimal(18, 2)
+  remarks       String?       @db.Text
+
+  // Relasi
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+
+  @@map("purchase_order_items")
 }

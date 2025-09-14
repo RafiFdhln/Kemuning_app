@@ -135,9 +135,14 @@ exports.Prisma.CustomerScalarFieldEnum = {
   id: 'id',
   code: 'code',
   name: 'name',
-  npwp: 'npwp',
-  address: 'address',
-  remarks: 'remarks'
+  address1: 'address1',
+  address2: 'address2',
+  address3: 'address3',
+  address4: 'address4',
+  address5: 'address5',
+  address6: 'address6',
+  attnInv: 'attnInv',
+  attnSj: 'attnSj'
 };
 
 exports.Prisma.SupplierScalarFieldEnum = {
@@ -204,6 +209,30 @@ exports.Prisma.QuotationItemScalarFieldEnum = {
   remarks: 'remarks'
 };
 
+exports.Prisma.PurchaseOrderScalarFieldEnum = {
+  id: 'id',
+  poNumber: 'poNumber',
+  quotationId: 'quotationId',
+  quotationNumber: 'quotationNumber',
+  customerId: 'customerId',
+  customerName: 'customerName',
+  status: 'status',
+  remarks: 'remarks',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PurchaseOrderItemScalarFieldEnum = {
+  id: 'id',
+  purchaseOrderId: 'purchaseOrderId',
+  name: 'name',
+  qty: 'qty',
+  unit: 'unit',
+  poPrice: 'poPrice',
+  totalPoPrice: 'totalPoPrice',
+  remarks: 'remarks'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -227,9 +256,14 @@ exports.Prisma.CustomerOrderByRelevanceFieldEnum = {
   id: 'id',
   code: 'code',
   name: 'name',
-  npwp: 'npwp',
-  address: 'address',
-  remarks: 'remarks'
+  address1: 'address1',
+  address2: 'address2',
+  address3: 'address3',
+  address4: 'address4',
+  address5: 'address5',
+  address6: 'address6',
+  attnInv: 'attnInv',
+  attnSj: 'attnSj'
 };
 
 exports.Prisma.SupplierOrderByRelevanceFieldEnum = {
@@ -276,6 +310,25 @@ exports.Prisma.QuotationItemOrderByRelevanceFieldEnum = {
   name: 'name',
   remarks: 'remarks'
 };
+
+exports.Prisma.PurchaseOrderOrderByRelevanceFieldEnum = {
+  id: 'id',
+  poNumber: 'poNumber',
+  quotationId: 'quotationId',
+  quotationNumber: 'quotationNumber',
+  customerId: 'customerId',
+  customerName: 'customerName',
+  status: 'status',
+  remarks: 'remarks'
+};
+
+exports.Prisma.PurchaseOrderItemOrderByRelevanceFieldEnum = {
+  id: 'id',
+  purchaseOrderId: 'purchaseOrderId',
+  name: 'name',
+  unit: 'unit',
+  remarks: 'remarks'
+};
 exports.ItemType = exports.$Enums.ItemType = {
   GOODS: 'GOODS',
   SERVICE: 'SERVICE'
@@ -300,7 +353,9 @@ exports.Prisma.ModelName = {
   Inquiry: 'Inquiry',
   InquiryItem: 'InquiryItem',
   Quotation: 'Quotation',
-  QuotationItem: 'QuotationItem'
+  QuotationItem: 'QuotationItem',
+  PurchaseOrder: 'PurchaseOrder',
+  PurchaseOrderItem: 'PurchaseOrderItem'
 };
 
 /**

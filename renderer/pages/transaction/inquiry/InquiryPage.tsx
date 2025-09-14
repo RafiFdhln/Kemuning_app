@@ -174,10 +174,12 @@ const useFormData = () => {
   };
 
   const updateFormData = (field: string, value: string | number | boolean) => {
+    console.log('updateFormData called:', { field, value });
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const updateOptionData = (field: string, value: string | null) => {
+    console.log('updateOptionData called:', { field, value });
     setFormData(prev => ({ ...prev, [field]: value || "" }));
   };
 
@@ -253,6 +255,9 @@ const InquiryPage = () => {
   // Event handlers
   const handleSave = async () => {
     try {
+      console.log('=== SAVE INQUIRY DEBUG ===');
+      console.log('Form data:', formData);
+      
       // Validation
       if (!formData.customerId) throw new Error('Customer harus dipilih');
       if (!formData.requestDate) throw new Error('Tanggal permintaan harus diisi');
@@ -265,10 +270,13 @@ const InquiryPage = () => {
       }
       
       const payload = { ...formData, requestDate: formData.requestDate };
+      console.log('Payload to send:', payload);
       
       const isEdit = !!formData.id;
       const url = "/api/transaction/inquiry";
       const method = isEdit ? "PUT" : "POST";
+      
+      console.log('Making request:', { method, url, payload });
       
       const res = await fetch(url, {
         method: method,
@@ -276,12 +284,18 @@ const InquiryPage = () => {
         body: JSON.stringify(isEdit ? { inquiryId: formData.id, items: formData.items } : payload),
       });
       
+      console.log('Response status:', res.status);
+      console.log('Response ok:', res.ok);
+      
       if (!res.ok) {
         const errorText = await res.text();
+        console.error('Error response:', errorText);
         throw new Error(`HTTP error! status: ${res.status} - ${errorText}`);
       }
       
       const result = await res.json();
+      console.log('Response result:', result);
+      
       if (!result.success) throw new Error(result.message || 'Failed to save inquiry');
       
       if (result.data) {
@@ -306,6 +320,7 @@ const InquiryPage = () => {
         toggleDrawer(false)();
       }
     } catch (error: any) {
+      console.error('Save error:', error);
       setErrorMessage(error.message || 'Terjadi kesalahan saat menyimpan inquiry');
       setErrorOpen(true);
     }
@@ -326,6 +341,7 @@ const InquiryPage = () => {
           )
         ) || 0,
         remarks: item.notes || null,
+        marginPct: Number(item.marginPct) || 0, // Add marginPct to payload
       }));
       const res = await fetch("/api/transaction/quotation", {
         method: "POST",
@@ -521,24 +537,6 @@ const InquiryPage = () => {
               <IconPencil fontSize="small" />
             </IconButton>
           )}
-          <IconButton
-              size="small"
-              // color="primary"
-              sx={{
-                color: "#0A8DD0",
-                border: "2px solid #0A8DD0", // warna biru border
-                backgroundColor: "#E6F7F9",   // biru muda background
-                borderRadius: "8px",         // biar agak rounded
-                "&:hover": {
-                  backgroundColor: "#bbdefb", // warna saat hover
-                }
-              }}
-              onClick={() => {
-                setSelectedInquiry(row.original);
-              }}
-            >
-              <IconFileDownload fontSize="small" />
-            </IconButton>
         </Box>
       ),
     },
