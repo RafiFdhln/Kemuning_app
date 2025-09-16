@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Snackbar, Typography, Divider, Drawer, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Checkbox, TextField } from "@mui/material";
+import { Alert, Box, Button, Snackbar, Typography, IconButton } from "@mui/material";
 import { useState, useEffect, useMemo } from "react";
 // @ts-ignore - pdfmake has mixed module exports
 import pdfMake from "pdfmake/build/pdfmake";
@@ -17,10 +17,93 @@ import PageContainer from "../../../src/components/container/PageContainer";
 import { baselightTheme } from "../../../src/theme/DefaultColors";
 import DataTable from "../../../components/DataTable";
 import QuotationDetailDrawer from "../../../components/QuotationDetailDrawer";
-import { IconCirclePlus, IconPencil, IconFileDownload } from "@tabler/icons-react";
+import AddNewDataDrawer from "../../../components/AddNewDataDrawer";
+import { IconPencil, IconFileDownload } from "@tabler/icons-react";
 import { MRT_ColumnDef } from "material-react-table";
 
+interface Customer {
+  id: string;
+  name: string;
+  address1?: string;
+  address2?: string;
+  attnSj?: string;
+  phone?: string;
+  fax?: string;
+}
+
+interface QuotationItemForm {
+  id: string;
+  name: string;
+  qty: number;
+  price: number;
+  totalPrice?: number;
+  remarks: string | null;
+  unit?: string;
+  detail?: string;
+  hpp?: number;
+  deliveryTime?: string;
+  supplierName?: string;
+  markupPercent?: number;
+  inquiryItemId?: string;
+}
+
+interface QuotationFormData {
+  id: string;
+  quotationNumber: string;
+  createdAt: string;
+  customerId: string;
+  category?: string;
+  remarks: string | null;
+  items: QuotationItemForm[];
+}
+
+const useCustomerData = () => {
+  const [customers, setCustomers] = useState<Customer[]>([]);
+
+  const fetchCustomers = async () => {
+    try {
+      const res = await fetch("/api/company/customer");
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      
+      const result = await res.json();
+      if (result.success && result.data) {
+        setCustomers(result.data);
+      }
+    } catch (error) {
+      console.error('Error fetching customers:', error);
+      setCustomers([]);
+    }
+  };
+
+  return { customers, fetchCustomers };
+};
+
+const useQuotationFormData = () => {
+  const formatDateTimeLocal = (d: Date) => {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    const mm = pad(d.getMonth() + 1);
+    const dd = pad(d.getDate());
+    const hh = pad(d.getHours());
+    const mi = pad(d.getMinutes());
+    return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+  };
+
+  const [formData, setFormData] = useState<QuotationFormData>({ id: "", quotationNumber: "", createdAt: "", customerId: "", category: undefined, remarks: "", items: []});
+
+  const updateFormData = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const updateOptionData = (field: string, value: string | null) => {
+    setFormData(prev => ({ ...prev, [field]: value || "" }));
+  };
+
+  return { formData, setFormData, updateFormData, updateOptionData, formatDateTimeLocal };
+};
+
 const QuotationPage = () => {
+  const [open, setOpen] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedQuotation, setSelectedQuotation] = useState<any | null>(null);
@@ -28,6 +111,10 @@ const QuotationPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successOpen, setSuccessOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+
+  const { formData, setFormData, updateFormData, updateOptionData, formatDateTimeLocal } = useQuotationFormData();
+  const { customers, fetchCustomers } = useCustomerData();
+
 
   useEffect(() => {
     const fetchQuotations = async () => {
@@ -48,7 +135,64 @@ const QuotationPage = () => {
       }
     };
     fetchQuotations();
+    fetchCustomers();
   }, []);
+
+  const handleSave = async () => {
+    try {
+      const payload = {
+        quotationId: formData.id,
+        quotationNumber: formData.quotationNumber,
+        customerId: formData.customerId,
+        createdAt: formData.createdAt,
+        category: formData.category,
+        remarks: formData.remarks,
+        items: formData.items.map(item => ({
+          id: item.id,
+          name: item.name,
+          qty: Number(item.qty),
+          price: Number(item.price),
+          remarks: item.remarks,
+          hpp: Number(item.hpp),
+          markupPercent: Number(item.markupPercent),
+          inquiryItemId: item.inquiryItemId,
+          unit: item.unit,
+          detail: item.detail,
+          deliveryTime: item.deliveryTime,
+          supplierName: item.supplierName,
+          via: (item as any).via,
+          totalPrice: Number(item.totalPrice ?? (Number(item.qty) * Number(item.price)))
+        }))
+      };
+
+      const res = await fetch('/api/transaction/quotation', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`HTTP error! status: ${res.status} - ${errorText}`);
+      }
+
+      const result = await res.json();
+      if (!result.success) {
+        throw new Error(result.message || 'Gagal memperbarui quotation');
+      }
+
+      setData(prevData => prevData.map(q => q.id === result.data.id ? result.data : q));
+      if (selectedQuotation && selectedQuotation.id === result.data.id) {
+        setSelectedQuotation(result.data);
+      }
+      setSuccessMessage('Quotation berhasil diperbarui!');
+      setSuccessOpen(true);
+      setOpen(false);
+    } catch (error: any) {
+      setErrorMessage(error.message || 'Terjadi kesalahan saat menyimpan quotation');
+      setErrorOpen(true);
+    }
+  };
 
   const columns = useMemo<MRT_ColumnDef<any>[]>(() => [
     {
@@ -165,10 +309,41 @@ const QuotationPage = () => {
               }
             }}
             onClick={() => {
-              setSelectedQuotation(row.original);
-              setDetailOpen(true);
-            }}
-          >
+                setSelectedQuotation(row.original);
+                setFormData({
+                  id: row.original.id,
+                  quotationNumber: row.original.quotationNumber,
+                  createdAt: formatDateTimeLocal(new Date(row.original.createdAt)),
+                  customerId: row.original.customer?.id || '',
+                  category: row.original.inquiry?.category || undefined,
+                  remarks: row.original.remarks,
+                  items: row.original.items?.map((item: any) => {
+                    const hpp = Number(item.inquiryItem?.hpp) || 0;
+                    const markupPercent = Number(item.inquiryItem?.markupPercent) || 0;
+                    const price = hpp + (hpp * markupPercent / 100);
+                    const qty = Number(item.qty);
+                    const totalPrice = qty * price;
+
+                    return {
+                      id: item.id,
+                      name: item.name,
+                      qty: qty,
+                      price: price,
+                      remarks: item.remarks,
+                      totalPrice: totalPrice,
+                      unit: item.inquiryItem?.unit || '',
+                      detail: item.inquiryItem?.detail || '',
+                      hpp: hpp,
+                      deliveryTime: item.inquiryItem?.deliveryTime ? new Date(item.inquiryItem.deliveryTime).toISOString().slice(0,10) : '-',
+                      supplierName: item.inquiryItem?.supplier?.name || '',
+                      markupPercent: markupPercent,
+                      inquiryItemId: item.inquiryItemId,
+                    };
+                  }) || []
+                });
+                setOpen(true);
+              }}
+            >
             <IconPencil fontSize="small" />
           </IconButton>
           <IconButton
@@ -191,7 +366,40 @@ const QuotationPage = () => {
         </Box>
       ),
     },
-  ], []);
+  ], [formatDateTimeLocal, setFormData]);
+
+  const formFields = [
+    { name: "quotationNumber", label: "No Quotation", type: "basictext" },
+    { name: "createdAt", label: "Tanggal", type: "datetime" },
+    { name: "category", label: "Kategori", type: "autocomplete", options: ["BARANG", "PROJECT"] },
+    {
+      name: "customerId",
+      label: "Customer",
+      type: "autocomplete",
+      options: customers.map((c) => ({ label: c.name, value: c.id })),
+    },
+    { name: "remarks", label: "Keterangan", type: "basictext" },
+    { 
+      name: "items", 
+      label: "Items", 
+      type: "items",
+      itemFields: [
+        { name: 'supplierName', label: 'Supplier', type: 'text' },
+        { name: 'name', label: 'Nama', type: 'text' },
+        { name: 'detail', label: 'Detail', type: 'text' },
+        { name: 'deliveryTime', label: 'Waktu Pengiriman', type: 'text'  },
+        { name: 'remarks', label: 'Catatan', type: 'text' },
+        { name: 'qty', label: 'Qty', type: 'number' },
+        { name: 'unit', label: 'Satuan', type: 'text'},
+        { name: 'price', label: 'Harga', type: 'number' },
+        { name: 'totalPrice', label: 'Total Harga', type: 'number', readOnly: true, isCalculated: true, calculation: (item: QuotationItemForm) => (item.qty || 0) * (item.price || 0) },
+        { name: 'hpp', label: 'HPP/Satuan', type: 'number' },
+        { name: 'markupPercent', label: 'UP TO %', type: 'number' },
+        { name: 'category', label: 'Kategori', type: 'text' },
+      ]
+    },
+  ];
+
 
   const handleCloseError = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === "clickaway") return;
@@ -373,10 +581,15 @@ const QuotationPage = () => {
             heights: [8, 8, 8]
           },
           layout: 'noBorders'
+        },{
+          text: " ", fontSize: 5
         },
         { text: "Dengan hormat,", fontSize: 10 },
         { text: "Dibawah ini kami kirimkan Penawaran Harga sebagai berikut :", fontSize: 10 },
         
+      ];
+      const rightInfo = [
+        { text: new Date().toLocaleDateString('id-ID'), fontSize: 10, alignment: 'right' }
       ];
 
 
@@ -386,11 +599,10 @@ const QuotationPage = () => {
           { text: 'Keterangan', bold: true, alignment: 'center', verticalAlignment: 'middle', fontSize: 10 },
           { text: 'Jumlah', bold: true, alignment: 'center', verticalAlignment: 'middle', fontSize: 10 },
           { text: 'Harga Satuan (IDR)', bold: true, alignment: 'center', fontSize: 10 },
-          { text: 'Total Harga (IDR)', bold: true, alignment: 'center', fontSize: 10 }
+          { text: 'Total Harga'+' '+' '+'(IDR)', bold: true, alignment: 'center', fontSize: 10 }
         ],
       ];
 
-      // Add quotation items to table - automatically show 7 items like invoice
       const maxItems = 10;
       for (let index = 0; index < maxItems; index++) {
         if (quotation.items && quotation.items[index]) {
@@ -417,7 +629,7 @@ const QuotationPage = () => {
             { text: '', alignment: 'center', verticalAlignment: 'middle', fontSize: 10 } as any,
             { text: '', alignment: 'right', fontSize: 10 } as any,
             { text: '', alignment: 'right', fontSize: 10 } as any
-          ]);
+        ]);
         }
       }
       const subtotal = quotation.items?.reduce((sum: number, item: any) => 
@@ -425,12 +637,12 @@ const QuotationPage = () => {
 
       const docDefinition: any = {
         pageSize: 'A4',
-        pageMargins: [40, 40, 40, 40],
+        pageMargins: [30, 30, 30, 30],
         content: [
           logoDataUrl ? { image: logoDataUrl, width: 380, margin: [0, 0, 0, 0] } : {},
-          { canvas: [ { type: 'line', x1: 0, y1: 0, x2: 555, y2: 0, lineWidth: 2 } ], margin: [0, 4, 0, 0]},
-          { canvas: [ { type: 'line', x1: 0, y1: 0, x2: 555, y2: 0, lineWidth: 1 } ], margin: [0, 3, 0, 0] },
-          { text: 'PENAWARAN HARGA', style: 'title', bold: true, margin: [0, 0, 0, 0], fontSize: 11 },
+          { canvas: [ { type: 'line', x1: 0, y1: 0, x2: 535, y2: 0, lineWidth: 2 } ], margin: [0, 4, 0, 0]},
+          { canvas: [ { type: 'line', x1: 0, y1: 0, x2: 535, y2: 0, lineWidth: 1 } ], margin: [0, 3, 0, 0] },
+          { text: 'PENAWARAN HARGA', style: 'title', bold: true, margin: [0, 10, 0, 0], fontSize: 11 },
           {
             columns: [
               { width: '*', text: '' },
@@ -440,7 +652,10 @@ const QuotationPage = () => {
             margin: [0, 0, 0, 8]
           },
           {
-            stack: leftInfo,
+            columns: [
+              { stack: leftInfo, width: '70%' },
+              { stack: rightInfo, width: '30%' }
+            ],
             margin: [0, 0, 0, 8]
           },
           {
@@ -449,28 +664,28 @@ const QuotationPage = () => {
               body: [
                 ...itemsBody,
                 [
-                  { text: '', colSpan: 3, border: [true, true, true, true] },
+                  { text: '', colSpan: 3, border: [false, false, false, false] },
                   { text: '' },
                   { text: '' },
                   { text: 'Sub.Total:', fontSize: 10, alignment: 'left', border: [true, true, false, true] },
                   { text: `Rp ${currency(subtotal)}`, fontSize: 10, alignment: 'right', border: [false, true, true, true] }
                 ],
                 [
-                  { text: '', colSpan: 3, border: [true, true, true, true] },
+                  { text: '', colSpan: 3, border: [false, false, false, false] },
                   { text: '' },
                   { text: '' },
                   { text: 'DPP PPN', fontSize: 10, alignment: 'left', border: [true, true, false, true] },
                   { text: `Rp ${currency(subtotal)}`, fontSize: 10, alignment: 'right', border: [false, false, true, true] }
                 ],
                 [
-                  { text: '', colSpan: 3, border: [true, true, true, true] },
+                  { text: '', colSpan: 3, border: [false, false, false, false] },
                   { text: '' },
                   { text: '' },
                   { text: 'PPN 12%', fontSize: 10, alignment: 'left', border: [true, true, false, true] },
                   { text: `Rp ${currency(subtotal * 0.12)}`, fontSize: 10, alignment: 'right', border: [false, false, true, true] }
                 ],
                 [
-                  { text: '', colSpan: 3, border: [true, true, true, true] },
+                  { text: '', colSpan: 3, border: [false, false, false, false] },
                   { text: '' },
                   { text: '' },
                   { text: 'Grand Total', fontSize: 10, alignment: 'left', bold: true, border: [true, true, false, true] },
@@ -588,6 +803,17 @@ const QuotationPage = () => {
         quotation={selectedQuotation}
         handleCreatePo={handleCreatePo}
       />
+      <AddNewDataDrawer
+        open={open}
+        onClose={() => setOpen(false)}
+        formData={formData}
+        handleFormChange={updateFormData}
+        handleOptionChange={updateOptionData}
+        handleSave={handleSave}
+        formFields={formFields}
+        width={"98%"}
+        variant="quotation"
+      />
       <Snackbar
         open={errorOpen}
         autoHideDuration={2000}
@@ -619,4 +845,3 @@ const QuotationPage = () => {
  };
  
  export default QuotationPage;
-

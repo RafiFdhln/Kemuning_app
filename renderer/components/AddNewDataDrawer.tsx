@@ -17,6 +17,19 @@ const AddNewDataDrawer = ({
   handleOptionChange,
   suppliers = [], // tambahkan default value
   title = 'Tambah Data', // tambahkan default title
+  variant,
+}: {
+  open: boolean;
+  onClose: (open: boolean) => void;
+  formData: any;
+  handleFormChange: (field: string, value: any) => void;
+  handleSave: () => void;
+  formFields: any[];
+  width?: string;
+  handleOptionChange: (field: string, value: string | null) => void;
+  suppliers?: any[];
+  title?: string;
+  variant?: 'inquiry' | 'quotation';
 }) => {
 
   const handleCloseDrawer = () => {
@@ -99,6 +112,7 @@ const AddNewDataDrawer = ({
             items={formData.items}
             onChange={(newItems) => handleFormChange("items", newItems)}
             suppliers={suppliers}
+            variant={variant}
           />
         );
       default:

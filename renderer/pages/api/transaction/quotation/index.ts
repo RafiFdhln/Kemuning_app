@@ -105,6 +105,134 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(500).json({ success: false, message: error.message });
     }
   }
-  res.setHeader("Allow", ["GET", "POST"]);
+  if (req.method === "PUT") {
+    try {
+      const { quotationId, quotationNumber, customerId, createdAt, category, remarks, items } = req.body;
+      
+      if (!quotationId) {
+        return res.status(400).json({ success: false, message: "quotationId is required" });
+      }
+
+      // Check if quotation exists
+      const existingQuotation = await prisma.quotation.findUnique({
+        where: { id: quotationId },
+        include: { items: true }
+      });
+
+      if (!existingQuotation) {
+        return res.status(404).json({ success: false, message: "Quotation not found" });
+      }
+
+      // Update quotation in a transaction
+      const updatedQuotation = await prisma.$transaction(async (tx) => {
+        // Delete existing quotation items
+        await tx.quotationItem.deleteMany({
+          where: { quotationId: quotationId }
+        });
+
+        // Update quotation basic info
+        const quotation = await tx.quotation.update({
+          where: { id: quotationId },
+          data: {
+            quotationNumber: quotationNumber || undefined,
+            customerId: customerId,
+            createdAt: createdAt ? new Date(createdAt) : undefined,
+            remarks: remarks,
+            updatedAt: new Date()
+          }
+        });
+
+        // Optionally update Inquiry category if provided
+        if (category) {
+          try {
+            await tx.inquiry.update({
+              where: { id: quotation.inquiryId },
+              data: { category }
+            });
+          } catch {}
+        }
+
+        // Create new quotation items
+        if (items && Array.isArray(items)) {
+          const quotationItems = items.map((item: any) => ({
+            quotationId: quotationId,
+            inquiryItemId: item.inquiryItemId || null,
+            name: item.name,
+            qty: Number(item.qty) || 0,
+            price: Number(item.price) || 0,
+            totalPrice: Number(item.totalPrice) || (Number(item.qty) * Number(item.price)),
+            remarks: item.remarks || null,
+          }));
+
+          await tx.quotationItem.createMany({
+            data: quotationItems
+          });
+
+          // Update related inquiry items if needed
+          for (const item of items) {
+            if (item.inquiryItemId) {
+              const updateData: any = {};
+              if (item.hpp !== undefined) updateData.hpp = Number(item.hpp);
+              if (item.markupPercent !== undefined) updateData.markupPercent = Number(item.markupPercent);
+              if (item.unit !== undefined) updateData.unit = item.unit;
+              if (item.detail !== undefined) updateData.detail = item.detail;
+              if (item.deliveryTime !== undefined && item.deliveryTime !== '-') {
+                const deliveryDate = new Date(item.deliveryTime);
+                // Interpret as free text: store as is in notes if invalid date
+                if (!isNaN(deliveryDate.getTime())) {
+                  updateData.deliveryTime = deliveryDate;
+                } else {
+                  updateData.notes = item.deliveryTime;
+                }
+              }
+              if (item.via !== undefined) updateData.status = String(item.via);
+              
+              // Handle supplier update
+              if (item.supplierName !== undefined) {
+                const supplier = await tx.supplier.findFirst({
+                  where: { name: item.supplierName }
+                });
+                if (supplier) {
+                  updateData.supplierId = supplier.id;
+                }
+              }
+
+              if (Object.keys(updateData).length > 0) {
+                await tx.inquiryItem.update({
+                  where: { id: item.inquiryItemId },
+                  data: updateData
+                });
+              }
+            }
+          }
+        }
+
+        // Return updated quotation with items
+        return await tx.quotation.findUnique({
+          where: { id: quotationId },
+          include: {
+            customer: true,
+            inquiry: true,
+            items: { include: { inquiryItem: true } },
+            purchaseOrders: true,
+          }
+        });
+      });
+
+      return res.status(200).json({ 
+        success: true, 
+        data: updatedQuotation, 
+        message: "Quotation updated successfully" 
+      });
+    } catch (error: any) {
+      console.error('Error updating quotation:', error);
+      return res.status(500).json({ 
+        success: false, 
+        message: error.message || "Internal Server Error" 
+      });
+    }
+  }
+  
+  res.setHeader("Allow", ["GET", "POST", "PUT"]);
   return res.status(405).end(`Method ${req.method} Not Allowed`);
 }
