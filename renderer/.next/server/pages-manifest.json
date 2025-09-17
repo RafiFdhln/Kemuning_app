@@ -3,6 +3,7 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/": "pages/index.js",
-  "/transaction/inquiry/InquiryPage": "pages/transaction/inquiry/InquiryPage.js",
+  "/api/transaction/quotation": "pages/api/transaction/quotation.js",
+  "/api/company/customer": "pages/api/company/customer.js",
   "/transaction/quotation/QuotationPage": "pages/transaction/quotation/QuotationPage.js"
 }

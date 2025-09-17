@@ -1,5 +1,6 @@
 import { Drawer, Box, Typography, Divider, Table, TableBody, TableCell, TableHead, TableRow, Button, Checkbox, TextField } from "@mui/material";
 import { useMemo, useState } from "react";
+import { currencyId } from "../lib/quotationCalc";
 
 const QuotationDetailDrawer = ({ open, onClose, quotation, handleCreatePo }) => {
   if (!quotation) return null;
@@ -138,6 +139,7 @@ const QuotationDetailDrawer = ({ open, onClose, quotation, handleCreatePo }) => 
               <TableCell>Total Harga</TableCell>
               <TableCell>HPP</TableCell>
               <TableCell>UP TO%</TableCell>
+              <TableCell>Diskon%</TableCell>
               <TableCell>Remark</TableCell>
               <TableCell>Via</TableCell>
               {selectMode && (
@@ -157,7 +159,9 @@ const QuotationDetailDrawer = ({ open, onClose, quotation, handleCreatePo }) => 
               const qty = item.qty ?? ii.qty ?? 0;
               const satuan = ii.unit || '-';
               const harga = item.price || 0;
-              const totalHarga = item.totalPrice || (qty * harga);
+              const discountPercent = Number(item.discountPercent ?? 0) || 0;
+              const discountedUnit = harga * (1 - discountPercent / 100);
+              const totalHarga = item.totalPrice || (qty * discountedUnit);
               const hpp = ii.hpp || 0;
               const upToPct = ii.markupPercent || 0;
               const remark = item.remarks || ii.notes || '-';
@@ -198,10 +202,11 @@ const QuotationDetailDrawer = ({ open, onClose, quotation, handleCreatePo }) => 
                     )}
                   </TableCell>
                   <TableCell>{satuan}</TableCell>
-                  <TableCell>{harga ? `Rp ${Number(harga).toLocaleString('id-ID')}` : '-'}</TableCell>
+                  <TableCell>{harga ? `Rp ${currencyId(discountedUnit)}` : '-'}</TableCell>
                   <TableCell>{totalHarga ? `Rp ${Number(totalHarga).toLocaleString('id-ID')}` : '-'}</TableCell>
                   <TableCell>{hpp ? `Rp ${Number(hpp).toLocaleString('id-ID')}` : '-'}</TableCell>
                   <TableCell>{upToPct ? `${Number(upToPct)}%` : '-'}</TableCell>
+                  <TableCell>{discountPercent ? `${discountPercent}%` : '-'}</TableCell>
                   <TableCell>{remark}</TableCell>
                   <TableCell>{via}</TableCell>
                   {selectMode && (

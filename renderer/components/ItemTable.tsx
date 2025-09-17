@@ -6,6 +6,7 @@ import {
 import { Delete } from "@mui/icons-material";
 import { baselightTheme } from "../src/theme/DefaultColors";
 import { useEffect } from "react";
+import { calculateItemTotals } from "../lib/quotationCalc";
 
 type ItemData = {
   name: string;
@@ -18,6 +19,7 @@ type ItemData = {
   price?: number;
   totalPrice?: number;
   markupPercent?: number;
+  discountPercent?: number;
   deliveryTime?: string;
   supplierId?: string;
   supplierName?: string;
@@ -35,21 +37,23 @@ const ItemsTable: React.FC<ItemsTableProps> = ({ items, onChange, suppliers, var
   const calculateValues = (item: ItemData) => {
     const qty = item.qty || 0;
     const hpp = item.hpp || 0;
-    const price = item.price || 0;
-    
+    const markupPercent = item.markupPercent || 0;
+    const discountPercent = item.discountPercent || 0;
+
     const totalHpp = qty * hpp;
-    const totalPrice = qty * price;
-    
-    return { totalHpp, totalPrice };
+    const { unitPrice, totalPrice } = calculateItemTotals({ qty, hpp, markupPercent, discountPercent });
+
+    return { totalHpp, totalPrice, unitPrice };
   };
 
   useEffect(() => {
     const updatedItems = items.map(item => {
-      const { totalHpp, totalPrice } = calculateValues(item);
+      const { totalHpp, totalPrice, unitPrice } = calculateValues(item);
       return {
         ...item,
         totalHpp,
         totalPrice,
+        price: unitPrice,
       };
     });
     
@@ -61,16 +65,17 @@ const ItemsTable: React.FC<ItemsTableProps> = ({ items, onChange, suppliers, var
     if (hasChanges) {
       onChange(updatedItems);
     }
-  }, [items.map(item => `${item.qty}-${item.hpp}-${item.price}`).join(',')]);
+  }, [items.map(item => `${item.qty}-${item.hpp}-${item.markupPercent}-${item.discountPercent}`).join(',')]);
 
   const handleChange = (index: number, field: keyof ItemData, value: any) => {
     const newItems = [...items];
     (newItems[index] as any)[field] = value;
     
-    if (field === 'qty' || field === 'hpp' || field === 'price') {
-      const { totalHpp, totalPrice } = calculateValues(newItems[index]);
+    if (field === 'qty' || field === 'hpp' || field === 'markupPercent' || field === 'discountPercent') {
+      const { totalHpp, totalPrice, unitPrice } = calculateValues(newItems[index]);
       newItems[index].totalHpp = totalHpp;
       newItems[index].totalPrice = totalPrice;
+      newItems[index].price = unitPrice;
     }
     
     onChange(newItems);
@@ -107,6 +112,7 @@ const ItemsTable: React.FC<ItemsTableProps> = ({ items, onChange, suppliers, var
       <TableCell sx={{ width: 100 }}>Total Harga</TableCell>
       <TableCell sx={{ width: 150 }}>HPP</TableCell>
       <TableCell sx={{ width: 100 }}>UP TO %</TableCell>
+      <TableCell sx={{ width: 110 }}>Diskon %</TableCell>
       <TableCell sx={{ minWidth: 150 }}>Remark</TableCell>
       <TableCell>Aksi</TableCell>
     </TableRow>
@@ -265,7 +271,7 @@ const ItemsTable: React.FC<ItemsTableProps> = ({ items, onChange, suppliers, var
           variant="standard"
           size="small"
           value={item.detail || ""}
-          placeholder="Brand"
+          placeholder="Detail"
           onChange={(e) => handleChange(index, "detail", e.target.value)}
         />
       </TableCell>
@@ -324,10 +330,15 @@ const ItemsTable: React.FC<ItemsTableProps> = ({ items, onChange, suppliers, var
           type="number"
           variant="standard"
           size="small"
-          value={item.price || ""}
+          value={item.price || 0}
           placeholder="Harga"
-          onChange={(e) => handleChange(index, "price", parseFloat(e.target.value))}
-          sx={{ width: 80 }}
+          InputProps={{ readOnly: true }}
+          sx={{ 
+            width: 100,
+            backgroundColor: '#f8f9fa',
+            '& .MuiInputBase-root': { color: '#6c757d', fontWeight: 500, borderBottom: '2px solid #dee2e6' },
+            '& .MuiInputBase-input': { cursor: 'default' }
+          }}
         />
       </TableCell>
       <TableCell>
@@ -372,6 +383,17 @@ const ItemsTable: React.FC<ItemsTableProps> = ({ items, onChange, suppliers, var
           placeholder="UP TO %"
           onChange={(e) => handleChange(index, "markupPercent", parseFloat(e.target.value))}
           sx={{ width: 80 }}
+        />
+      </TableCell>
+      <TableCell>
+        <TextField
+          type="number"
+          variant="standard"
+          size="small"
+          value={item.discountPercent || 0}
+          placeholder="Diskon %"
+          onChange={(e) => handleChange(index, "discountPercent" as any, parseFloat(e.target.value))}
+          sx={{ width: 90 }}
         />
       </TableCell>
       <TableCell>

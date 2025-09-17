@@ -20,6 +20,7 @@ import QuotationDetailDrawer from "../../../components/QuotationDetailDrawer";
 import AddNewDataDrawer from "../../../components/AddNewDataDrawer";
 import { IconPencil, IconFileDownload } from "@tabler/icons-react";
 import { MRT_ColumnDef } from "material-react-table";
+import { Height } from "@mui/icons-material";
 
 interface Customer {
   id: string;
@@ -44,6 +45,7 @@ interface QuotationItemForm {
   deliveryTime?: string;
   supplierName?: string;
   markupPercent?: number;
+  discountPercent?: number;
   inquiryItemId?: string;
 }
 
@@ -155,6 +157,7 @@ const QuotationPage = () => {
           remarks: item.remarks,
           hpp: Number(item.hpp),
           markupPercent: Number(item.markupPercent),
+          discountPercent: Number((item as any).discountPercent ?? 0),
           inquiryItemId: item.inquiryItemId,
           unit: item.unit,
           detail: item.detail,
@@ -320,15 +323,17 @@ const QuotationPage = () => {
                   items: row.original.items?.map((item: any) => {
                     const hpp = Number(item.inquiryItem?.hpp) || 0;
                     const markupPercent = Number(item.inquiryItem?.markupPercent) || 0;
+                    const discountPercent = Number(item.discountPercent ?? 0) || 0;
                     const price = hpp + (hpp * markupPercent / 100);
+                    const discountedPrice = price * (1 - discountPercent / 100);
                     const qty = Number(item.qty);
-                    const totalPrice = qty * price;
+                    const totalPrice = qty * discountedPrice;
 
                     return {
                       id: item.id,
                       name: item.name,
                       qty: qty,
-                      price: price,
+                      price: discountedPrice,
                       remarks: item.remarks,
                       totalPrice: totalPrice,
                       unit: item.inquiryItem?.unit || '',
@@ -337,6 +342,7 @@ const QuotationPage = () => {
                       deliveryTime: item.inquiryItem?.deliveryTime ? new Date(item.inquiryItem.deliveryTime).toISOString().slice(0,10) : '-',
                       supplierName: item.inquiryItem?.supplier?.name || '',
                       markupPercent: markupPercent,
+                      discountPercent: discountPercent,
                       inquiryItemId: item.inquiryItemId,
                     };
                   }) || []
@@ -466,8 +472,6 @@ const QuotationPage = () => {
         }),
         status: 'DRAFT'
       };
-
-      console.log('QuotationPage - PO data to send:', poData);
 
       // Test with simple endpoint first
       const testRes = await fetch("/api/test-po", {
@@ -603,7 +607,7 @@ const QuotationPage = () => {
         ],
       ];
 
-      const maxItems = 10;
+      const maxItems = 17;
       for (let index = 0; index < maxItems; index++) {
         if (quotation.items && quotation.items[index]) {
           const item = quotation.items[index];
@@ -615,11 +619,11 @@ const QuotationPage = () => {
           const totalHarga = item.totalPrice || (qty * harga);
           
           itemsBody.push([
-            { text: String(index + 1), alignment: 'center', fontSize: 10 } as any,
-            { text: String(nama), verticalAlignment: 'middle', fontSize: 10 } as any,
-            { text: String(qty + ' ' + satuan), alignment: 'center', verticalAlignment: 'middle', fontSize: 10 } as any,
-            { text: currency(harga), alignment: 'right', fontSize: 10 } as any,
-            { text: currency(totalHarga), alignment: 'right', fontSize: 10 } as any
+            { text: String(index + 1), alignment: 'center', fontSize: 10, height: 8 } as any,
+            { text: String(nama), verticalAlignment: 'middle', fontSize: 10, height: 8 } as any,
+            { text: String(qty + ' ' + satuan), alignment: 'center', verticalAlignment: 'middle', fontSize: 10, height: 8 } as any,
+            { text: currency(harga), alignment: 'right', fontSize: 10, height: 8 } as any,
+            { text: currency(totalHarga), alignment: 'right', fontSize: 10, height: 8 } as any
           ]);
         } else {
           // Add empty row for remaining items without number
@@ -694,8 +698,8 @@ const QuotationPage = () => {
               ],
               fontSize: 10,
               heights: (rowIndex: number) => {
-                if (rowIndex === 0) return 20; // Header
-                if (rowIndex <= itemsBody.length - 1) return 16; // Data rows
+                if (rowIndex === 0) return 20; // Header row
+                if (rowIndex > 0 && rowIndex < itemsBody.length) return 8; // Item rows
                 return 14; // Summary rows
               },
             },
