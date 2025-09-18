@@ -6,12 +6,17 @@ const baselightTheme = createTheme({
     primary: {
       main: "#50B498",
       light: "#ECF2FF",
-      dark: "#468585"
+      dark: "#468585",
     },
     secondary: {
       main: "#009DB0",
       light: "#E8F7FF",
       dark: "#23afdb",
+    },
+    red: {
+      main:  "#FF2D2D",
+      light: "#FFEAEA",
+      dark: "#d41414",
     },
     success: {
       main: "#8BC34A",
@@ -44,10 +49,6 @@ const baselightTheme = createTheme({
       400: "#B4B4B4",
       500: "#747474",
       600: "#2A3547",
-    },
-    text: {
-      primary: "#2D2F39",
-      secondary: "#4f4f64",
     },
     action: {
       disabledBackground: "rgba(73,82,88,0.12)",

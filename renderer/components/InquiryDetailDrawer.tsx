@@ -1,17 +1,16 @@
 import { Drawer, Box, Typography, Divider, Table, TableBody, TableCell, TableHead, TableRow, Button, Checkbox, TextField } from "@mui/material";
 import { useMemo, useState } from "react";
+import { baselightTheme } from "../src/theme/DefaultColors";
 
-const InquiryDetailDrawer = ({ open, onClose, inquiry, handleCreateQuotation }) => {
+interface InquiryDetailDrawerProps {
+  open: boolean;
+  onClose: () => void;
+  inquiry: any;
+  handleCreateQuotation?: (payload: any) => void;
+}
+
+const InquiryDetailDrawer = ({ open, onClose, inquiry, handleCreateQuotation }: InquiryDetailDrawerProps) => {
   if (!inquiry) return null;
-  
-  // Debug: Log inquiry data to see supplier information
-  console.log('InquiryDetailDrawer - inquiry data:', inquiry);
-  console.log('InquiryDetailDrawer - items with supplier:', inquiry.items?.map(item => ({
-    name: item.name,
-    supplierId: item.supplierId,
-    supplierName: item.supplierName,
-    supplier: item.supplier
-  })));
 
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIndexes, setSelectedIndexes] = useState<Set<number>>(new Set());
@@ -56,7 +55,7 @@ const InquiryDetailDrawer = ({ open, onClose, inquiry, handleCreateQuotation }) 
     if (allSelected) {
       setSelectedIndexes(new Set<number>());
     } else {
-      setSelectedIndexes(new Set<number>(Array.from(allItemIndexes)));
+      setSelectedIndexes(allItemIndexes);
     }
   };
 
@@ -109,163 +108,347 @@ const InquiryDetailDrawer = ({ open, onClose, inquiry, handleCreateQuotation }) 
     }
   };
 
-  const subtotalAfterMargin = useMemo(() => {
-    if (!selectMode) return 0;
-    return (inquiry.items || []).reduce((sum: number, item: any, idx: number) => {
-      if (!selectedIndexes.has(idx)) return sum;
-      const qty = Number(qtyByIndex[idx] ?? item.qty) || 0;
-      const hpp = Number(item.hpp) || 0;
-      const marginPct = Number(marginPctByIndex[idx] ?? 0) || 0;
-      const price = hpp * (1 + marginPct / 100);
-      return sum + qty * price;
-    }, 0);
-  }, [selectMode, inquiry.items, selectedIndexes, qtyByIndex, marginPctByIndex]);
+  const totalInquiryPrice = useMemo(() => {
+    const total = selectMode
+      ? Array.from(selectedIndexes).reduce((sum, idx) => {
+          const item = inquiry.items?.[idx];
+          if (!item) return sum;
+          const qty = Number(qtyByIndex[idx] ?? item.qty) || 0;
+          const hpp = Number(item.hpp) || 0;
+          return sum + qty * hpp;
+        }, 0)
+      : (inquiry.items || []).reduce((sum: number, item: any) => 
+          sum + (Number(item.totalHpp) || (Number(item.qty) * Number(item.hpp)) || 0), 0);
+    return total;
+  }, [inquiry.items, selectMode, selectedIndexes, qtyByIndex]);
 
   return (
-    <Drawer anchor="right" open={open} onClose={onClose} PaperProps={{ sx: { minWidth: 500, p: 3 } }}>
-      <Box sx={{ p: 3 }}>
-        <Typography variant="h5" gutterBottom>Detail Inquiry</Typography>
-        <Divider sx={{ mb: 2 }} />
-        <Typography><b>No Permintaan:</b> {inquiry.requestNumber}</Typography>
-        <Typography><b>Tanggal:</b> {inquiry.requestDate ? new Date(inquiry.requestDate).toLocaleDateString() : '-'}</Typography>
-        <Typography><b>Kategori:</b> {inquiry.category}</Typography>
-        <Typography><b>Customer:</b> {inquiry.customer?.name || inquiry.customerId}</Typography>
-        <Typography><b>Status:</b> {inquiry.status}</Typography>
-        <Typography><b>Keterangan:</b> {inquiry.remarks}</Typography>
-        <Divider sx={{ my: 2 }} />
-        <Typography variant="h6" gutterBottom>Daftar Item</Typography>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              {selectMode && (
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    indeterminate={someSelected}
-                    checked={allSelected}
-                    onChange={toggleSelectAll}
-                  />
-                </TableCell>
-              )}
-              <TableCell>Nama</TableCell>
-              <TableCell>Supplier</TableCell>
-              <TableCell>Detail</TableCell>
-              <TableCell>Qty</TableCell>
-              <TableCell>Satuan</TableCell>
-              <TableCell>HPP/Satuan</TableCell>
-              <TableCell>TOTAL HPP</TableCell>
-              {selectMode && (
-                <>
-                  <TableCell>Margin %</TableCell>
-                  <TableCell>Total Jual</TableCell>
-                </>
-              )}
-              <TableCell>Status</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {inquiry.items?.map((item, idx) => (
-              <TableRow key={idx}>
+    <Drawer anchor="right" open={open} onClose={onClose} PaperProps={{ sx: { minWidth: "84%", p: 4 } }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+        <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, color: 'text.main' }}>
+          Detail Inquiry
+        </Typography>
+        <Divider sx={{ mb: 3 }} />
+        
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+          gap: 2,
+          bgcolor: 'grey.200',
+          p: 3,
+          borderRadius: '7px',
+          mb: 3
+        }}>
+          <Box>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>Nomor Permintaan</Typography>
+            <Typography variant="body1" fontWeight={500}>{inquiry.requestNumber}</Typography>
+          </Box>
+          <Box>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>Kategori</Typography>
+            <Typography variant="body1" fontWeight={500}>{inquiry.category}</Typography>
+          </Box>
+          <Box>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>Customer</Typography>
+            <Typography variant="body1" fontWeight={500}>{inquiry.customer?.name || inquiry.customerId}</Typography>
+          </Box>
+          <Box>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>Status</Typography>
+            <Typography variant="body1" fontWeight={500}>{inquiry.status}</Typography>
+          </Box>
+          <Box>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>Keterangan</Typography>
+            <Typography variant="body1" fontWeight={500}>{inquiry.remarks || '-'}</Typography>
+          </Box>
+          <Box>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>Tanggal</Typography>
+            <Typography variant="body1" fontWeight={500}>
+              {inquiry.requestDate ? new Date(inquiry.requestDate).toLocaleDateString('id-ID', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              }) : '-'}
+            </Typography>
+          </Box>
+        </Box>
+        
+        <Box sx={{ 
+          overflowX: 'auto',
+          '& .MuiTable-root': {
+            minWidth: selectMode ? '100%' : 1200,
+            borderCollapse: 'separate',
+            borderSpacing: '0 8px',
+            table: {
+              layout: selectMode ? 'fixed' : 'auto'
+            }
+          }
+        }}>
+          <Table width="100%">
+            <TableHead>
+              <TableRow sx={{ 
+                '& .MuiTableCell-head': { 
+                  fontWeight: 600,
+                  bgcolor: 'primary.dark',
+                  color: 'grey.100',
+                  borderBottom: 'none',
+                  fontSize: '12px',
+                  whiteSpace: 'nowrap',
+                  padding: '12px',
+                }
+              }}>
                 {selectMode && (
-                  <TableCell padding="checkbox">
+                  <TableCell padding="checkbox" sx={{ borderRadius: '8px 0 0 8px', py: 0 }}>
                     <Checkbox
-                      checked={selectedIndexes.has(idx)}
-                      onChange={() => toggleRow(idx)}
+                      indeterminate={someSelected}
+                      checked={allSelected}
+                      onChange={toggleSelectAll}
+                      sx={{
+                        '&.Mui-checked': { color: 'primary.main' },
+                        '&.MuiCheckbox-indeterminate': { color: 'primary.main' }
+                      }}
                     />
                   </TableCell>
                 )}
-                <TableCell>{item.name}</TableCell>
-                <TableCell>{item.supplierName || (item.supplier?.name) || '-'}</TableCell>
-                <TableCell>{item.detail}</TableCell>
-                <TableCell>
-                  {selectMode ? (
-                    <TextField
-                      type="number"
-                      size="small"
-                      value={qtyByIndex[idx] ?? item.qty}
-                      inputProps={{ min: 0 }}
-                      onChange={(e) => {
-                        const val = Number(e.target.value);
-                        setQtyByIndex(prev => ({ ...prev, [idx]: val }));
-                      }}
-                      disabled={!selectedIndexes.has(idx)}
-                      sx={{ width: 90 }}
-                    />
-                  ) : (
-                    item.qty
-                  )}
-                </TableCell>
-                <TableCell>{item.unit}</TableCell>
-                <TableCell>{item.hpp}</TableCell>
-                <TableCell>
-                  {selectMode
-                    ? ((Number(qtyByIndex[idx] ?? item.qty) || 0) * (Number(item.hpp) || 0))
-                    : (item.totalHpp || (item.qty * item.hpp))}
-                </TableCell>
+                <TableCell sx={{ borderRadius: selectMode ? '0' : '8px 0 0 8px ' }}>Nama</TableCell>
+                <TableCell>Supplier</TableCell>
+                <TableCell>Detail</TableCell>
+                <TableCell align="right">Qty</TableCell>
+                <TableCell>Satuan</TableCell>
+                <TableCell align="right">HPP/Satuan</TableCell>
+                <TableCell align="right">TOTAL HPP</TableCell>
                 {selectMode && (
                   <>
-                    <TableCell>
+                    <TableCell align="right">Margin %</TableCell>
+                    <TableCell align="right">Total Jual</TableCell>
+                  </>
+                )}
+                <TableCell sx={{ borderRadius: selectMode ? '0 8px 8px 0' : '0 8px 8px 0' }}>Status</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {inquiry.items?.map((item, idx) => (
+                <TableRow key={idx} sx={{
+                  '& .MuiTableCell-root': {
+                    borderBottom: '1px solid',
+                    borderColor: 'grey.300',
+                    py: 1
+                  },
+                  '&:hover': {
+                    bgcolor: 'primary.light'
+                  }
+                }}>
+                  {selectMode && (
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        checked={selectedIndexes.has(idx)}
+                        onChange={() => toggleRow(idx)}
+                        sx={{
+                          '&.Mui-checked': { color: 'primary.main' }
+                        }}
+                      />
+                    </TableCell>
+                  )}
+                  <TableCell sx={{ 
+                    fontWeight: 500,
+                    ...(selectMode && {
+                      maxWidth: 0,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    })
+                  }}>{item.name}</TableCell>
+                  <TableCell sx={{
+                    ...(selectMode && {
+                      maxWidth: 0,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    })
+                  }}>{item.supplierName || (item.supplier?.name) || '-'}</TableCell>
+                  <TableCell sx={{
+                    ...(selectMode && {
+                      maxWidth: 0,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    })
+                  }}>{item.detail}</TableCell>
+                  <TableCell align="right" sx={{ minWidth: selectMode ? '80px' : 'auto' }}>
+                    {selectMode ? (
                       <TextField
                         type="number"
                         size="small"
-                        value={marginPctByIndex[idx] ?? 0}
-                        inputProps={{ min: 0 }}
+                        value={qtyByIndex[idx] ?? item.qty}
+                        inputProps={{ 
+                          min: 0,
+                          style: { textAlign: 'right' }
+                        }}
                         onChange={(e) => {
                           const val = Number(e.target.value);
-                          setMarginPctByIndex(prev => ({ ...prev, [idx]: val }));
+                          setQtyByIndex(prev => ({ ...prev, [idx]: val }));
                         }}
                         disabled={!selectedIndexes.has(idx)}
-                        sx={{ width: 90 }}
+                        sx={{
+                          width: 90,
+                          '& .MuiOutlinedInput-root': {
+                            bgcolor: 'grey.100'
+                          },
+                          '& .Mui-disabled': {
+                            bgcolor: 'grey.200'
+                          }
+                        }}
                       />
-                    </TableCell>
-                    <TableCell>
-                      {(() => {
-                        const qty = Number(qtyByIndex[idx] ?? item.qty) || 0;
-                        const hpp = Number(item.hpp) || 0;
-                        const marginPct = Number(marginPctByIndex[idx] ?? 0) || 0;
-                        const price = hpp * (1 + marginPct / 100);
-                        return qty * price;
-                      })()}
-                    </TableCell>
-                  </>
-                )}
-                <TableCell>{item.status || '-'}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        {selectMode && (
-          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-            <Typography variant="subtitle1"><b>Total:</b> {subtotalAfterMargin}</Typography>
-          </Box>
-        )}
+                    ) : (
+                      item.qty
+                    )}
+                  </TableCell>
+                  <TableCell>{item.unit}</TableCell>
+                  <TableCell align="right">
+                    {item.hpp ? `Rp ${Number(item.hpp).toLocaleString('id-ID')}` : '-'}
+                  </TableCell>
+                  <TableCell align="right">
+                    {selectMode
+                      ? `Rp ${((Number(qtyByIndex[idx] ?? item.qty) || 0) * (Number(item.hpp) || 0)).toLocaleString('id-ID')}`
+                      : `Rp ${(item.totalHpp || (item.qty * item.hpp)).toLocaleString('id-ID')}`}
+                  </TableCell>
+                  {selectMode && (
+                    <>
+                      <TableCell align="right">
+                        <TextField
+                          type="number"
+                          size="small"
+                          value={marginPctByIndex[idx] ?? 0}
+                          inputProps={{ 
+                            min: 0,
+                            style: { textAlign: 'right' }
+                          }}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            setMarginPctByIndex(prev => ({ ...prev, [idx]: val }));
+                          }}
+                          disabled={!selectedIndexes.has(idx)}
+                          sx={{
+                            width: 90,
+                            '& .MuiOutlinedInput-root': {
+                              bgcolor: '#ffffff'
+                            },
+                            '& .Mui-disabled': {
+                              bgcolor: '#f5f5f5'
+                            }
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell align="right">
+                        {(() => {
+                          const qty = Number(qtyByIndex[idx] ?? item.qty) || 0;
+                          const hpp = Number(item.hpp) || 0;
+                          const marginPct = Number(marginPctByIndex[idx] ?? 0) || 0;
+                          const price = hpp * (1 + marginPct / 100);
+                          return `Rp ${(qty * price).toLocaleString('id-ID')}`;
+                        })()}
+                      </TableCell>
+                    </>
+                  )}
+                  <TableCell>{item.status || '-'}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Box>
         
-        {inquiry.status !== 'QUOTED' && !selectMode && (
+        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+          <Typography variant="subtitle1" fontSize={14}>
+            <b>Total: </b>
+            Rp {totalInquiryPrice.toLocaleString('id-ID')}
+          </Typography>
+        </Box>
+
+        <Box sx={{ 
+          mt: 3,
+          pt: 3,
+          borderTop: '1px solid #e0e0e0',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          gap: 2,
+          mb: 2
+        }}>
+          {!selectMode ? (
+            inquiry.status !== 'QUOTED' && (
+              <Button 
+                variant="contained"
+                onClick={handleQuotationClick}
+                disabled={!handleCreateQuotation || !allItemsReady}
+                title={!allItemsReady ? "Semua barang harus dalam status READY" : ""}
+                sx={{
+                  bgcolor: 'primary.main',
+                  color: 'grey.100',
+                  '&:hover': { 
+                    bgcolor: 'primary.dark' 
+                  },
+                  px: 3,
+                  py: 0.875,
+                  fontWeight: 500,
+                }}
+              >
+                Jadikan Quotation
+              </Button>
+            )
+          ) : (
+            <>
+              <Button 
+                variant="contained"
+                onClick={cancelSelectMode}
+                color="error"
+                sx={{
+                  px: 3,
+                  py: 1,
+                  fontWeight: 500,
+                  bgcolor: 'red.main',
+                  color: 'grey.100',
+                  '&:hover': {
+                    bgcolor: 'red.dark',
+                  }
+                }}
+              >
+                Batal
+              </Button>
+              <Button 
+                variant="contained"
+                onClick={handleQuotationClick}
+                disabled={!handleCreateQuotation || selectedIndexes.size === 0}
+                sx={{
+                  bgcolor: 'primary.main',
+                  color: 'grey.100',
+                  '&:hover': { bgcolor: 'primary.dark' },
+                  '&.Mui-disabled': {
+                    bgcolor: 'action.disabledBackground'
+                  },
+                  px: 3,
+                  py: 1,
+                  fontWeight: 500,
+                }}
+              >
+                Buat Quotation
+              </Button>
+            </>
+          )}
           <Button 
-            sx={{ mt: 3, mr: 2 }} 
-            variant="contained" 
-            color="secondary" 
-            onClick={handleQuotationClick}
-            disabled={!handleCreateQuotation || !allItemsReady}
-            title={!allItemsReady ? "Semua barang harus dalam status READY" : ""}
+            variant="outlined"
+            onClick={onClose}
+            sx={{
+              borderColor: 'grey.400',
+              color: 'grey.600',
+              '&:hover': {
+                borderColor: 'grey.500',
+                bgcolor: 'grey.200',
+              },
+              px: 3,
+              py: 1,
+              fontWeight: 500,
+            }}
           >
-            Jadikan Quotation
+            Tutup
           </Button>
-        )}
-        {inquiry.status !== 'QUOTED' && selectMode && (
-          <>
-            <Button 
-              sx={{ mt: 3, mr: 2 }} 
-              variant="contained" 
-              color="secondary" 
-              onClick={handleQuotationClick}
-              disabled={!handleCreateQuotation || selectedIndexes.size === 0}
-            >
-              Buat Quotation
-            </Button>
-            <Button sx={{ mt: 3, mr: 2 }} variant="outlined" color="inherit" onClick={cancelSelectMode}>Batal</Button>
-          </>
-        )}
-        <Button sx={{ mt: 3 }} variant="outlined" onClick={onClose}>Tutup</Button>
+        </Box>
       </Box>
     </Drawer>
   );

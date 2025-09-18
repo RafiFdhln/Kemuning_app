@@ -10,9 +10,10 @@ interface BasicInputProps {
   onChange?: (event: React.ChangeEvent<HTMLInputElement> | any, value: string | null) => void;
   disabled?: boolean;
   readOnly?: boolean;
+  placeholder?: string | null;
 }
 
-const BasicInput: React.FC<BasicInputProps> = ({ label, value, onChange, multiline, type = "text", disabled = false, readOnly = false }) => {
+const BasicInput: React.FC<BasicInputProps> = ({ label, placeholder, value, onChange, multiline, type = "text", disabled = false, readOnly = false }) => {
   return (
     <Box
       sx={{
@@ -48,6 +49,7 @@ const BasicInput: React.FC<BasicInputProps> = ({ label, value, onChange, multili
           value={value ?? ''}
           onChange={onChange} 
           variant="outlined" 
+          placeholder={placeholder}
           fullWidth 
           size="small" 
           disabled={disabled}

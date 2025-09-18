@@ -445,7 +445,8 @@ const InquiryPage = () => {
                 border: '2px solid #FF2D2D',
                 backgroundColor: '#FFEAEA',
                 color: '#FF2D2D',
-                fontWeight: 500
+                fontWeight: 500,
+                fontSize: '4px'
               };
             case 'INCOMPLETE':
               return {
@@ -466,7 +467,8 @@ const InquiryPage = () => {
                 border: '2px solid #9e9e9e',
                 backgroundColor: '#f5f5f5',
                 color: '#9e9e9e',
-                fontWeight: 400
+                fontWeight: 400,
+                fontSize: '12px'
               };
           }
         };
@@ -576,6 +578,7 @@ const InquiryPage = () => {
                         fontWeight: 600,
                         color: baselightTheme.palette.text.primary,
                         borderColor: baselightTheme.palette.grey[400],
+                        px:3, py:1
                       }}
                     >
                       Export
@@ -588,6 +591,7 @@ const InquiryPage = () => {
                         fontWeight: 600,
                         color: baselightTheme.palette.text.primary,
                         borderColor: baselightTheme.palette.grey[400],
+                        px:3, py:0.5
                       }}
                     >
                       Import
@@ -596,7 +600,7 @@ const InquiryPage = () => {
                       variant="contained"
                       startIcon={<IconCirclePlus size={20} />}
                       onClick={toggleDrawer(true)}
-                      sx={{ fontWeight: 500, color: 'white' }}
+                      sx={{ fontWeight: 500, color: 'white', px:3, py:0.5}}
                     >
                       Tambah Inquiry
                     </Button>
